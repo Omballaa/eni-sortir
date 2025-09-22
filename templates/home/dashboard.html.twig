@@ -206,7 +206,11 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span class="text-primary">{{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.</span>
+                                        <a href="{{ path('app_profil_show', {id: sortie.organisateur.id}) }}" 
+                                           class="text-primary text-decoration-none" 
+                                           title="Voir le profil de {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}">
+                                            {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.
+                                        </a>
                                         {% if sortie.organisateur.id == user.id %}
                                             <br><small class="badge bg-warning text-dark">Moi</small>
                                         {% endif %}

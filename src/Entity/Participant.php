@@ -43,6 +43,9 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'actif', type: 'boolean')]
     private bool $actif = true;
 
+    #[ORM\Column(name: 'photo', length: 255, nullable: true)]
+    private ?string $photo = null;
+
     #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'participants')]
     #[ORM\JoinColumn(name: 'no_site', referencedColumnName: 'no_site', nullable: false)]
     private ?Site $site = null;
@@ -234,6 +237,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
                 $inscription->setParticipant(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
 
         return $this;
     }
