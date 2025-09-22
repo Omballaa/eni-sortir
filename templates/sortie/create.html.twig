@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une sortie - ENI Sorties{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-3">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Créer une sortie
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="row">
+                        <!-- Colonne gauche -->
+                        <div class="col-md-6">
+                            {{ form_row(form.nom) }}
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {{ form_row(form.dateHeureDebut) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_row(form.duree) }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {{ form_row(form.dateLimiteInscription) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_row(form.nbInscriptionsMax) }}
+                                </div>
+                            </div>
+                            
+                            {{ form_row(form.infosSortie) }}
+                        </div>
+                        
+                        <!-- Colonne droite -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Ville organisatrice</label>
+                                <input type="text" class="form-control" value="{{ app.user.site.nomSite }}" readonly>
+                                <small class="text-muted">Votre campus</small>
+                            </div>
+                            
+                            {{ form_row(form.ville) }}
+                            
+                            {{ form_row(form.lieu) }}
+                            
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="addLieuBtn">
+                                    <i class="fas fa-plus me-1"></i>Ajouter un nouveau lieu
+                                </button>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.latitude) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.longitude) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Annuler
+                        </a>
+                        
+                        <div>
+                            <button type="submit" name="action" value="save" class="btn btn-primary me-2">
+                                <i class="fas fa-save me-1"></i>Enregistrer
+                            </button>
+                            <button type="submit" name="action" value="publish" class="btn btn-success">
+                                <i class="fas fa-share me-1"></i>Publier la sortie
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const villeSelect = document.querySelector('#sortie_ville');
+    const lieuSelect = document.querySelector('#sortie_lieu');
+    
+    if (villeSelect) {
+        villeSelect.addEventListener('change', function() {
+            const villeId = this.value;
+            
+            // Réinitialiser le select des lieux
+            lieuSelect.innerHTML = '<option value="">Chargement...</option>';
+            lieuSelect.disabled = true;
+            
+            if (villeId) {
+                // Charger les lieux de cette ville
+                fetch(`/api/villes/${villeId}/lieux`)
+                    .then(response => response.json())
+                    .then(lieux => {
+                        lieuSelect.innerHTML = '<option value="">Choisissez un lieu</option>';
+                        lieux.forEach(lieu => {
+                            const option = document.createElement('option');
+                            option.value = lieu.id;
+                            option.textContent = lieu.nomLieu;
+                            lieuSelect.appendChild(option);
+                        });
+                        lieuSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des lieux:', error);
+                        lieuSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
+            } else {
+                lieuSelect.innerHTML = '<option value="">Choisissez d\'abord une ville</option>';
+                lieuSelect.disabled = false;
+            }
+        });
+    }
+    
+    // Validation des dates
+    const dateHeureDebut = document.querySelector('#sortie_dateHeureDebut');
+    const dateLimiteInscription = document.querySelector('#sortie_dateLimiteInscription');
+    
+    if (dateHeureDebut && dateLimiteInscription) {
+        function validateDates() {
+            const debut = new Date(dateHeureDebut.value);
+            const limite = new Date(dateLimiteInscription.value);
+            
+            if (debut && limite && limite >= debut) {
+                dateLimiteInscription.setCustomValidity('La date limite d\'inscription doit être antérieure à la date de la sortie');
+            } else {
+                dateLimiteInscription.setCustomValidity('');
+            }
+        }
+        
+        dateHeureDebut.addEventListener('change', validateDates);
+        dateLimiteInscription.addEventListener('change', validateDates);
+    }
+});
+</script>
+{% endblock %}

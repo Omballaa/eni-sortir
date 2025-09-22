@@ -132,7 +132,7 @@
                 <i class="bi bi-calendar-event"></i> Liste des sorties 
                 <span class="badge bg-primary">{{ sorties|length }}</span>
             </h5>
-            <a href="#" class="btn btn-success btn-sm">
+            <a href="{{ path('app_sortie_create') }}" class="btn btn-success btn-sm">
                 <i class="bi bi-plus-circle"></i> Créer une sortie
             </a>
         </div>
@@ -217,22 +217,27 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="#" class="btn btn-outline-primary" title="Afficher">
+                                            <a href="{{ path('app_sortie_show', {id: sortie.id}) }}" class="btn btn-outline-primary" title="Afficher">
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                             {% if sortie.organisateur.id == user.id %}
-                                                <a href="#" class="btn btn-outline-warning" title="Modifier">
+                                                <a href="{{ path('app_sortie_edit', {id: sortie.id}) }}" class="btn btn-outline-warning" title="Modifier">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             {% endif %}
                                             {% if not isInscrit and sortie.etat.libelle == 'Ouverte' and nbInscrits < sortie.nbInscriptionsMax %}
-                                                <a href="#" class="btn btn-outline-success" title="S'inscrire">
-                                                    <i class="bi bi-person-plus"></i>
-                                                </a>
+                                                <form method="post" action="{{ path('app_inscription_create', {id: sortie.id}) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-success btn-sm" title="S'inscrire">
+                                                        <i class="bi bi-person-plus"></i>
+                                                    </button>
+                                                </form>
                                             {% elseif isInscrit and sortie.etat.libelle == 'Ouverte' %}
-                                                <a href="#" class="btn btn-outline-danger" title="Se désister">
-                                                    <i class="bi bi-person-dash"></i>
-                                                </a>
+                                                <form method="post" action="{{ path('app_inscription_delete', {id: sortie.id}) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Se désister"
+                                                            onclick="return confirm('Êtes-vous sûr de vouloir vous désister ?')">
+                                                        <i class="bi bi-person-dash"></i>
+                                                    </button>
+                                                </form>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -246,7 +251,7 @@
                     <i class="bi bi-calendar-x display-1 text-muted"></i>
                     <h4 class="text-muted mt-3">Aucune sortie trouvée</h4>
                     <p class="text-muted">Modifiez vos critères de recherche ou créez une nouvelle sortie.</p>
-                    <a href="#" class="btn btn-primary">
+                    <a href="{{ path('app_sortie_create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Créer une sortie
                     </a>
                 </div>
