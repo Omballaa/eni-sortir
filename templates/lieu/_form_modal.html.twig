@@ -1,0 +1,55 @@
+<!-- Formulaire de création de lieu -->
+{{ form_start(form, {'attr': {'id': 'lieu-form', 'class': 'needs-validation'}}) }}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.nomLieu) }}
+                {{ form_widget(form.nomLieu) }}
+                {{ form_errors(form.nomLieu) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.ville) }}
+                {{ form_widget(form.ville) }}
+                {{ form_errors(form.ville) }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                {{ form_label(form.rue) }}
+                {{ form_widget(form.rue) }}
+                {{ form_errors(form.rue) }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.latitude) }}
+                {{ form_widget(form.latitude) }}
+                {{ form_errors(form.latitude) }}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>Entre -90 et 90 (optionnel)
+                </small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.longitude) }}
+                {{ form_widget(form.longitude) }}
+                {{ form_errors(form.longitude) }}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>Entre -180 et 180 (optionnel)
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Messages d'erreur et de succès -->
+    <div id="lieu-form-messages"></div>
+{{ form_end(form) }}
