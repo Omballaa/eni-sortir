@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Mon App Symfony{% endblock %}</title>
+        <title>{% block title %}ENI Sortir{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         {# Bootstrap CSS via CDN - Version 5.3 #}
@@ -25,18 +25,59 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="{{ path('app_home') }}">
-                    <i class="bi bi-house"></i> Mon App
+                    <i class="bi bi-calendar-event"></i> ENI Sortir
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_home') }}">
                                 <i class="bi bi-house"></i> Accueil
                             </a>
                         </li>
+                        {% if is_granted('ROLE_USER') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <i class="bi bi-calendar-plus"></i> Sorties
+                                </a>
+                            </li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">
+                                        <i class="bi bi-gear"></i> Administration
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        {% if is_granted('ROLE_USER') %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.prenom }} {{ app.user.nom }}
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <span class="badge bg-warning text-dark ms-1">Admin</span>
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">
+                                        <i class="bi bi-person"></i> Mon profil
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_logout') }}">
+                                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                    </a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_login') }}">
+                                    <i class="bi bi-box-arrow-in-right"></i> Connexion
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -51,7 +92,7 @@
         <footer class="bg-light mt-5 py-4">
             <div class="container">
                 <div class="text-center text-muted">
-                    <p>&copy; {{ "now"|date("Y") }} Mon App Symfony - Propulsé par <a href="https://getbootstrap.com" class="text-decoration-none">Bootstrap</a></p>
+                    <p>&copy; {{ "now"|date("Y") }} ENI Sortir - Application de gestion des sorties</p>
                 </div>
             </div>
         </footer>

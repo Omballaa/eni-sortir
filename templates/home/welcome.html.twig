@@ -1,0 +1,64 @@
+{% extends 'base_public.html.twig' %}
+
+{% block title %}Bienvenue - ENI Sortir{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-calendar-event display-1 text-primary mb-4"></i>
+                    <h1 class="h2 mb-4">Bienvenue sur ENI Sortir</h1>
+                    <p class="lead text-muted mb-4">
+                        La plateforme de gestion des sorties et activités de l'École Nationale d'Informatique
+                    </p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-people display-6 text-success mb-2"></i>
+                                    <h5>Participez</h5>
+                                    <p class="small text-muted">Rejoignez les sorties organisées par vos collègues</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-calendar-plus display-6 text-info mb-2"></i>
+                                    <h5>Organisez</h5>
+                                    <p class="small text-muted">Créez vos propres événements et sorties</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-geo-alt display-6 text-warning mb-2"></i>
+                                    <h5>Découvrez</h5>
+                                    <p class="small text-muted">Explorez de nouveaux lieux et activités</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Se connecter
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    <p class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Vous devez être un participant ENI pour accéder à l'application
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

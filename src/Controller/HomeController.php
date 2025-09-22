@@ -11,6 +11,14 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig');
+        // Si l'utilisateur est connecté, afficher le tableau de bord
+        if ($this->getUser()) {
+            return $this->render('home/dashboard.html.twig', [
+                'user' => $this->getUser(),
+            ]);
+        }
+        
+        // Sinon, afficher la page d'accueil publique
+        return $this->render('home/welcome.html.twig');
     }
 }

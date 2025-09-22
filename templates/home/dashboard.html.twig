@@ -1,24 +1,125 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - {{ parent() }}{% endblock %}
+{% block title %}Tableau de bord - {{ parent() }}{% endblock %}
 
 {% block body %}
     {# Hero Section avec Bootstrap #}
     <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
         <div class="container">
             <h1 class="display-4">
-                <i class="bi bi-bootstrap"></i> Bienvenue !
+                <i class="bi bi-person-check"></i> Bienvenue, {{ user.prenom }} !
             </h1>
-            <p class="lead">Votre application Symfony avec Bootstrap est prête !</p>
+            <p class="lead">Votre espace personnel ENI Sortir</p>
             <hr class="my-4">
-            <p>Utilisez uniquement les classes Bootstrap pour le style - aucun CSS personnalisé nécessaire.</p>
-            <a class="btn btn-light btn-lg" href="#exemples" role="button">
-                <i class="bi bi-arrow-down"></i> Voir les exemples
-            </a>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Site :</strong> {{ user.site.nomSite }}</p>
+                    <p><strong>Email :</strong> {{ user.mail }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% if user.administrateur %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            <i class="bi bi-shield-check"></i> Administrateur
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success fs-6">
+                            <i class="bi bi-person"></i> Participant
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
-    {# Section Examples #}
+    {# Section Dashboard #}
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-plus"></i> Mes Sorties
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Gérez vos sorties organisées et participations.</p>
+                    <a href="#" class="btn btn-primary">
+                        <i class="bi bi-eye"></i> Voir mes sorties
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-search"></i> Rechercher
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Trouvez de nouvelles sorties à rejoindre.</p>
+                    <a href="#" class="btn btn-success">
+                        <i class="bi bi-search"></i> Rechercher
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person"></i> Mon Profil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Modifiez vos informations personnelles.</p>
+                    <a href="#" class="btn btn-info">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if user.administrateur %}
+        {# Section Admin #}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-shield-check"></i> Administration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="bi bi-people"></i> Utilisateurs
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="bi bi-building"></i> Sites
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="bi bi-geo-alt"></i> Lieux
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="bi bi-bar-chart"></i> Statistiques
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
     <section id="exemples">
         <h2 class="mb-4">
             <i class="bi bi-palette"></i> Exemples de composants Bootstrap
