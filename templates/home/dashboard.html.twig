@@ -1,284 +1,262 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord - {{ parent() }}{% endblock %}
+{% block title %}Accueil - {{ parent() }}{% endblock %}
 
 {% block body %}
-    {# Hero Section avec Bootstrap #}
-    <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
-        <div class="container">
-            <h1 class="display-4">
-                <i class="bi bi-person-check"></i> Bienvenue, {{ user.prenom }} !
+    {# En-tête avec informations utilisateur #}
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-house-door"></i> Accueil
             </h1>
-            <p class="lead">Votre espace personnel ENI Sortir</p>
-            <hr class="my-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Site :</strong> {{ user.site.nomSite }}</p>
-                    <p><strong>Email :</strong> {{ user.mail }}</p>
-                </div>
-                <div class="col-md-6">
-                    {% if user.administrateur %}
-                        <span class="badge bg-warning text-dark fs-6">
-                            <i class="bi bi-shield-check"></i> Administrateur
-                        </span>
-                    {% else %}
-                        <span class="badge bg-success fs-6">
-                            <i class="bi bi-person"></i> Participant
-                        </span>
-                    {% endif %}
-                </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="text-muted">
+                <small>Date du jour : {{ "now"|date("d/m/Y") }}</small><br>
+                <small>Participant : {{ user.prenom }} {{ user.nom }}</small>
             </div>
         </div>
     </div>
 
-    {# Section Dashboard #}
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-calendar-plus"></i> Mes Sorties
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Gérez vos sorties organisées et participations.</p>
-                    <a href="#" class="btn btn-primary">
-                        <i class="bi bi-eye"></i> Voir mes sorties
-                    </a>
-                </div>
-            </div>
+    {# Section des filtres #}
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-funnel"></i> Filtrer les sorties
+            </h5>
         </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-success">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-search"></i> Rechercher
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Trouvez de nouvelles sorties à rejoindre.</p>
-                    <a href="#" class="btn btn-success">
-                        <i class="bi bi-search"></i> Rechercher
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-info">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-person"></i> Mon Profil
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Modifiez vos informations personnelles.</p>
-                    <a href="#" class="btn btn-info">
-                        <i class="bi bi-pencil"></i> Modifier
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% if user.administrateur %}
-        {# Section Admin #}
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-warning">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-shield-check"></i> Administration
-                        </h5>
+        <div class="card-body">
+            <form method="get" action="{{ path('app_home') }}">
+                <div class="row g-3">
+                    {# Site #}
+                    <div class="col-md-3">
+                        <label for="site" class="form-label">Site :</label>
+                        <select name="site" id="site" class="form-select">
+                            <option value="">Tous les sites</option>
+                            {% for siteOption in sites %}
+                                <option value="{{ siteOption.id }}" 
+                                        {% if filtres.site == siteOption.id %}selected{% endif %}>
+                                    {{ siteOption.nomSite }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
-                                    <i class="bi bi-people"></i> Utilisateurs
-                                </a>
+
+                    {# Nom de la sortie #}
+                    <div class="col-md-3">
+                        <label for="nom" class="form-label">Le nom de la sortie contient :</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="nom" id="nom" class="form-control" 
+                                   value="{{ filtres.nom }}" placeholder="Rechercher...">
+                        </div>
+                    </div>
+
+                    {# Dates avec labels intégrés #}
+                    <div class="col-md-4">
+                        <label class="form-label">Période :</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">Du</span>
+                                    <input type="date" name="dateDebut" id="dateDebut" class="form-control" 
+                                           value="{{ filtres.dateDebut }}">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
-                                    <i class="bi bi-building"></i> Sites
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
-                                    <i class="bi bi-geo-alt"></i> Lieux
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="#" class="btn btn-outline-warning w-100 mb-2">
-                                    <i class="bi bi-bar-chart"></i> Statistiques
-                                </a>
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">Au</span>
+                                    <input type="date" name="dateFin" id="dateFin" class="form-control" 
+                                           value="{{ filtres.dateFin }}">
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {# Bouton rechercher aligné #}
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100 d-block">
+                            <i class="bi bi-search"></i> Rechercher
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                {# Options de filtrage #}
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="organisateurSeulement" 
+                                   id="organisateurSeulement" value="1" 
+                                   {% if filtres.organisateurSeulement %}checked{% endif %}>
+                            <label class="form-check-label" for="organisateurSeulement">
+                                Sorties dont je suis l'organisateur/trice
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="inscritSeulement" 
+                                   id="inscritSeulement" value="1" 
+                                   {% if filtres.inscritSeulement %}checked{% endif %}>
+                            <label class="form-check-label" for="inscritSeulement">
+                                Sorties auxquelles je suis inscrit/e
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="nonInscritSeulement" 
+                                   id="nonInscritSeulement" value="1" 
+                                   {% if filtres.nonInscritSeulement %}checked{% endif %}>
+                            <label class="form-check-label" for="nonInscritSeulement">
+                                Sorties auxquelles je ne suis pas inscrit/e
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="sortiesPassees" 
+                                   id="sortiesPassees" value="1" 
+                                   {% if filtres.sortiesPassees %}checked{% endif %}>
+                            <label class="form-check-label" for="sortiesPassees">
+                                Sorties passées
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Tableau des sorties #}
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-calendar-event"></i> Liste des sorties 
+                <span class="badge bg-primary">{{ sorties|length }}</span>
+            </h5>
+            <a href="#" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle"></i> Créer une sortie
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if sorties|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nom de la sortie</th>
+                                <th>Date de la sortie</th>
+                                <th>Clôture</th>
+                                <th>Inscrits/places</th>
+                                <th>État</th>
+                                <th>Inscrit</th>
+                                <th>Organisateur</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sortie in sorties %}
+                                {% set isInscrit = false %}
+                                {% set nbInscrits = sortie.inscriptions|length %}
+                                {% for inscription in sortie.inscriptions %}
+                                    {% if inscription.participant.id == user.id %}
+                                        {% set isInscrit = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <tr>
+                                    <td>
+                                        <strong>{{ sortie.nom }}</strong>
+                                        {% if sortie.infosSortie %}
+                                            <br><small class="text-muted">{{ sortie.infosSortie|slice(0, 50) }}{% if sortie.infosSortie|length > 50 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-calendar3"></i> 
+                                        {{ sortie.dateHeureDebut|date('d/m/Y H\\hi') }}
+                                        {% if sortie.duree %}
+                                            <br><small class="text-muted">Durée: {{ sortie.duree }}min</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-clock"></i> 
+                                        {{ sortie.dateLimiteInscription|date('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if nbInscrits >= sortie.nbInscriptionsMax %}bg-danger{% else %}bg-success{% endif %}">
+                                            {{ nbInscrits }}/{{ sortie.nbInscriptionsMax }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% set etatClass = 'secondary' %}
+                                        {% if sortie.etat.libelle == 'Ouverte' %}
+                                            {% set etatClass = 'success' %}
+                                        {% elseif sortie.etat.libelle == 'Clôturée' %}
+                                            {% set etatClass = 'warning' %}
+                                        {% elseif sortie.etat.libelle == 'En cours' %}
+                                            {% set etatClass = 'info' %}
+                                        {% elseif sortie.etat.libelle == 'Fermée' %}
+                                            {% set etatClass = 'danger' %}
+                                        {% endif %}
+                                        <span class="badge bg-{{ etatClass }}">{{ sortie.etat.libelle }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if isInscrit %}
+                                            <i class="bi bi-check-circle-fill text-success" title="Inscrit"></i>
+                                        {% else %}
+                                            <i class="bi bi-x-circle text-muted" title="Non inscrit"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="text-primary">{{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.</span>
+                                        {% if sortie.organisateur.id == user.id %}
+                                            <br><small class="badge bg-warning text-dark">Moi</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="#" class="btn btn-outline-primary" title="Afficher">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if sortie.organisateur.id == user.id %}
+                                                <a href="#" class="btn btn-outline-warning" title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if not isInscrit and sortie.etat.libelle == 'Ouverte' and nbInscrits < sortie.nbInscriptionsMax %}
+                                                <a href="#" class="btn btn-outline-success" title="S'inscrire">
+                                                    <i class="bi bi-person-plus"></i>
+                                                </a>
+                                            {% elseif isInscrit and sortie.etat.libelle == 'Ouverte' %}
+                                                <a href="#" class="btn btn-outline-danger" title="Se désister">
+                                                    <i class="bi bi-person-dash"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x display-1 text-muted"></i>
+                    <h4 class="text-muted mt-3">Aucune sortie trouvée</h4>
+                    <p class="text-muted">Modifiez vos critères de recherche ou créez une nouvelle sortie.</p>
+                    <a href="#" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Créer une sortie
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Note administrative #}
+    {% if user.administrateur %}
+        <div class="alert alert-warning mt-4" role="alert">
+            <i class="bi bi-shield-check"></i>
+            <strong>Mode administrateur :</strong> 
+            Les liens Villes et Sites sont accessibles uniquement en tant qu'administrateur.
+            <a href="#" class="alert-link ms-2">Accéder aux outils d'administration</a>
         </div>
     {% endif %}
-    <section id="exemples">
-        <h2 class="mb-4">
-            <i class="bi bi-palette"></i> Exemples de composants Bootstrap
-        </h2>
-
-        {# Cards #}
-        <div class="row mb-4">
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <i class="bi bi-check-circle"></i> Succès
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Bootstrap fonctionne !</h5>
-                        <p class="card-text">Toutes les classes Bootstrap sont disponibles sans configuration supplémentaire.</p>
-                        <a href="#" class="btn btn-success">
-                            <i class="bi bi-hand-thumbs-up"></i> Super !
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <i class="bi bi-info-circle"></i> Information
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Aucun CSS personnalisé</h5>
-                        <p class="card-text">Utilisez uniquement les classes Bootstrap pour un style cohérent et professionnel.</p>
-                        <a href="#" class="btn btn-info">
-                            <i class="bi bi-lightbulb"></i> En savoir plus
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <i class="bi bi-exclamation-triangle"></i> Important
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Responsive by design</h5>
-                        <p class="card-text">Bootstrap garantit que votre site s'adapte à tous les écrans automatiquement.</p>
-                        <a href="#" class="btn btn-warning">
-                            <i class="bi bi-phone"></i> Tester
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {# Alerts #}
-        <h3 class="mb-3">
-            <i class="bi bi-bell"></i> Alerts Bootstrap
-        </h3>
-        <div class="alert alert-primary" role="alert">
-            <i class="bi bi-info-circle"></i> 
-            <strong>Info :</strong> Ceci est une alerte Bootstrap primaire avec une icône.
-        </div>
-        <div class="alert alert-success" role="alert">
-            <i class="bi bi-check-circle"></i> 
-            <strong>Succès :</strong> Votre configuration Bootstrap fonctionne parfaitement !
-        </div>
-        <div class="alert alert-warning" role="alert">
-            <i class="bi bi-exclamation-triangle"></i> 
-            <strong>Attention :</strong> N'ajoutez pas de CSS personnalisé, utilisez Bootstrap !
-        </div>
-
-        {# Buttons #}
-        <h3 class="mb-3">
-            <i class="bi bi-ui-radios"></i> Boutons Bootstrap
-        </h3>
-        <div class="mb-4">
-            <button type="button" class="btn btn-primary me-2">
-                <i class="bi bi-star"></i> Primaire
-            </button>
-            <button type="button" class="btn btn-secondary me-2">
-                <i class="bi bi-gear"></i> Secondaire
-            </button>
-            <button type="button" class="btn btn-success me-2">
-                <i class="bi bi-check"></i> Succès
-            </button>
-            <button type="button" class="btn btn-danger me-2">
-                <i class="bi bi-x"></i> Danger
-            </button>
-            <button type="button" class="btn btn-warning me-2">
-                <i class="bi bi-exclamation-triangle"></i> Warning
-            </button>
-            <button type="button" class="btn btn-info me-2">
-                <i class="bi bi-info-circle"></i> Info
-            </button>
-            <button type="button" class="btn btn-outline-dark">
-                <i class="bi bi-moon"></i> Outline
-            </button>
-        </div>
-
-        {# Form Example #}
-        <h3 class="mb-3">
-            <i class="bi bi-card-text"></i> Formulaire Bootstrap
-        </h3>
-        <div class="row">
-            <div class="col-md-6">
-                <form>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">
-                            <i class="bi bi-envelope"></i> Email
-                        </label>
-                        <input type="email" class="form-control" id="email" placeholder="votre@email.com">
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">
-                            <i class="bi bi-chat-text"></i> Message
-                        </label>
-                        <textarea class="form-control" id="message" rows="3" placeholder="Votre message..."></textarea>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="newsletter">
-                        <label class="form-check-label" for="newsletter">
-                            S'abonner à la newsletter
-                        </label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i> Envoyer
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        {# Progress bars #}
-        <h3 class="mt-4 mb-3">
-            <i class="bi bi-bar-chart"></i> Barres de progression
-        </h3>
-        <div class="progress mb-3">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
-        </div>
-        <div class="progress mb-3">
-            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
-        </div>
-        <div class="progress mb-4">
-            <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-        </div>
-
-        {# Documentation #}
-        <div class="alert alert-light border" role="alert">
-            <h4 class="alert-heading">
-                <i class="bi bi-book"></i> Documentation
-            </h4>
-            <p>Pour plus de composants et d'exemples, consultez la documentation officielle :</p>
-            <hr>
-            <p class="mb-0">
-                <a href="https://getbootstrap.com/docs/5.3/components/" target="_blank" class="btn btn-outline-primary">
-                    <i class="bi bi-box-arrow-up-right"></i> Documentation Bootstrap
-                </a>
-                <a href="https://icons.getbootstrap.com/" target="_blank" class="btn btn-outline-secondary ms-2">
-                    <i class="bi bi-icons"></i> Icônes Bootstrap
-                </a>
-            </p>
-        </div>
-    </section>
 {% endblock %}

@@ -2,23 +2,110 @@
 
 namespace App\Controller;
 
+use App\Entity\Site;
+use App\Repository\SortieRepository;
+use App\Repository\SiteRepository;
+use App\Repository\ParticipantRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
-    {
-        // Si l'utilisateur est connecté, afficher le tableau de bord
-        if ($this->getUser()) {
-            return $this->render('home/dashboard.html.twig', [
-                'user' => $this->getUser(),
-            ]);
+    public function index(
+        Request $request,
+        SortieRepository $sortieRepository,
+        SiteRepository $siteRepository,
+        ParticipantRepository $participantRepository
+    ): Response {
+        // Si l'utilisateur n'est pas connecté, afficher la page d'accueil publique
+        if (!$this->getUser()) {
+            return $this->render('home/welcome.html.twig');
         }
-        
-        // Sinon, afficher la page d'accueil publique
-        return $this->render('home/welcome.html.twig');
+
+        // Récupération des filtres depuis la requête
+        $criteria = [];
+        $site = $request->query->get('site');
+        $nom = $request->query->get('nom');
+        $dateDebut = $request->query->get('dateDebut');
+        $dateFin = $request->query->get('dateFin');
+        $organisateurSeulement = $request->query->get('organisateurSeulement');
+        $inscritSeulement = $request->query->get('inscritSeulement');
+        $nonInscritSeulement = $request->query->get('nonInscritSeulement');
+        $sortiesPassees = $request->query->get('sortiesPassees');
+
+        // Construction des critères de recherche
+        if ($site) {
+            $criteria['site'] = $site;
+        }
+        if ($nom) {
+            $criteria['nom'] = $nom;
+        }
+        if ($dateDebut) {
+            $criteria['dateDebut'] = new \DateTime($dateDebut);
+        }
+        if ($dateFin) {
+            $criteria['dateFin'] = new \DateTime($dateFin . ' 23:59:59');
+        }
+
+        // Récupération des sorties selon les filtres
+        $sorties = $sortieRepository->search($criteria);
+        /** @var \App\Entity\Participant $user */
+        $user = $this->getUser();
+
+        // Filtrage supplémentaire selon les options utilisateur
+        if ($organisateurSeulement) {
+            $sorties = array_filter($sorties, fn($sortie) => $sortie->getOrganisateur()->getId() === $user->getId());
+        }
+
+        if ($inscritSeulement) {
+            $sorties = array_filter($sorties, function($sortie) use ($user) {
+                foreach ($sortie->getInscriptions() as $inscription) {
+                    if ($inscription->getParticipant()->getId() === $user->getId()) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        if ($nonInscritSeulement) {
+            $sorties = array_filter($sorties, function($sortie) use ($user) {
+                foreach ($sortie->getInscriptions() as $inscription) {
+                    if ($inscription->getParticipant()->getId() === $user->getId()) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        if (!$sortiesPassees) {
+            $now = new \DateTime();
+            $sorties = array_filter($sorties, fn($sortie) => $sortie->getDateHeureDebut() >= $now);
+        }
+
+        // Récupération des données pour les formulaires de filtres
+        $sites = $siteRepository->findAllOrderedByName();
+        $organisateurs = $participantRepository->findAll();
+
+        return $this->render('home/dashboard.html.twig', [
+            'user' => $user,
+            'sorties' => $sorties,
+            'sites' => $sites,
+            'organisateurs' => $organisateurs,
+            'filtres' => [
+                'site' => $site,
+                'nom' => $nom,
+                'dateDebut' => $dateDebut,
+                'dateFin' => $dateFin,
+                'organisateurSeulement' => $organisateurSeulement,
+                'inscritSeulement' => $inscritSeulement,
+                'nonInscritSeulement' => $nonInscritSeulement,
+                'sortiesPassees' => $sortiesPassees,
+            ]
+        ]);
     }
 }
