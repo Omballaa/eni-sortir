@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - {{ parent() }}{% endblock %}
+
+{% block body %}
+    {# Hero Section avec Bootstrap #}
+    <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+        <div class="container">
+            <h1 class="display-4">
+                <i class="bi bi-bootstrap"></i> Bienvenue !
+            </h1>
+            <p class="lead">Votre application Symfony avec Bootstrap est prête !</p>
+            <hr class="my-4">
+            <p>Utilisez uniquement les classes Bootstrap pour le style - aucun CSS personnalisé nécessaire.</p>
+            <a class="btn btn-light btn-lg" href="#exemples" role="button">
+                <i class="bi bi-arrow-down"></i> Voir les exemples
+            </a>
+        </div>
+    </div>
+
+    {# Section Examples #}
+    <section id="exemples">
+        <h2 class="mb-4">
+            <i class="bi bi-palette"></i> Exemples de composants Bootstrap
+        </h2>
+
+        {# Cards #}
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-check-circle"></i> Succès
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Bootstrap fonctionne !</h5>
+                        <p class="card-text">Toutes les classes Bootstrap sont disponibles sans configuration supplémentaire.</p>
+                        <a href="#" class="btn btn-success">
+                            <i class="bi bi-hand-thumbs-up"></i> Super !
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <i class="bi bi-info-circle"></i> Information
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Aucun CSS personnalisé</h5>
+                        <p class="card-text">Utilisez uniquement les classes Bootstrap pour un style cohérent et professionnel.</p>
+                        <a href="#" class="btn btn-info">
+                            <i class="bi bi-lightbulb"></i> En savoir plus
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <i class="bi bi-exclamation-triangle"></i> Important
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Responsive by design</h5>
+                        <p class="card-text">Bootstrap garantit que votre site s'adapte à tous les écrans automatiquement.</p>
+                        <a href="#" class="btn btn-warning">
+                            <i class="bi bi-phone"></i> Tester
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Alerts #}
+        <h3 class="mb-3">
+            <i class="bi bi-bell"></i> Alerts Bootstrap
+        </h3>
+        <div class="alert alert-primary" role="alert">
+            <i class="bi bi-info-circle"></i> 
+            <strong>Info :</strong> Ceci est une alerte Bootstrap primaire avec une icône.
+        </div>
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> 
+            <strong>Succès :</strong> Votre configuration Bootstrap fonctionne parfaitement !
+        </div>
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> 
+            <strong>Attention :</strong> N'ajoutez pas de CSS personnalisé, utilisez Bootstrap !
+        </div>
+
+        {# Buttons #}
+        <h3 class="mb-3">
+            <i class="bi bi-ui-radios"></i> Boutons Bootstrap
+        </h3>
+        <div class="mb-4">
+            <button type="button" class="btn btn-primary me-2">
+                <i class="bi bi-star"></i> Primaire
+            </button>
+            <button type="button" class="btn btn-secondary me-2">
+                <i class="bi bi-gear"></i> Secondaire
+            </button>
+            <button type="button" class="btn btn-success me-2">
+                <i class="bi bi-check"></i> Succès
+            </button>
+            <button type="button" class="btn btn-danger me-2">
+                <i class="bi bi-x"></i> Danger
+            </button>
+            <button type="button" class="btn btn-warning me-2">
+                <i class="bi bi-exclamation-triangle"></i> Warning
+            </button>
+            <button type="button" class="btn btn-info me-2">
+                <i class="bi bi-info-circle"></i> Info
+            </button>
+            <button type="button" class="btn btn-outline-dark">
+                <i class="bi bi-moon"></i> Outline
+            </button>
+        </div>
+
+        {# Form Example #}
+        <h3 class="mb-3">
+            <i class="bi bi-card-text"></i> Formulaire Bootstrap
+        </h3>
+        <div class="row">
+            <div class="col-md-6">
+                <form>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input type="email" class="form-control" id="email" placeholder="votre@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">
+                            <i class="bi bi-chat-text"></i> Message
+                        </label>
+                        <textarea class="form-control" id="message" rows="3" placeholder="Votre message..."></textarea>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="newsletter">
+                        <label class="form-check-label" for="newsletter">
+                            S'abonner à la newsletter
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Envoyer
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {# Progress bars #}
+        <h3 class="mt-4 mb-3">
+            <i class="bi bi-bar-chart"></i> Barres de progression
+        </h3>
+        <div class="progress mb-3">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+        </div>
+        <div class="progress mb-3">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+        </div>
+        <div class="progress mb-4">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+        </div>
+
+        {# Documentation #}
+        <div class="alert alert-light border" role="alert">
+            <h4 class="alert-heading">
+                <i class="bi bi-book"></i> Documentation
+            </h4>
+            <p>Pour plus de composants et d'exemples, consultez la documentation officielle :</p>
+            <hr>
+            <p class="mb-0">
+                <a href="https://getbootstrap.com/docs/5.3/components/" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-box-arrow-up-right"></i> Documentation Bootstrap
+                </a>
+                <a href="https://icons.getbootstrap.com/" target="_blank" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-icons"></i> Icônes Bootstrap
+                </a>
+            </p>
+        </div>
+    </section>
+{% endblock %}
