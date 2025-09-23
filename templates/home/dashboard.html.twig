@@ -258,14 +258,4 @@
             {% endif %}
         </div>
     </div>
-
-    {# Note administrative #}
-    {% if user.administrateur %}
-        <div class="alert alert-warning mt-4" role="alert">
-            <i class="bi bi-shield-check"></i>
-            <strong>Mode administrateur :</strong> 
-            Les liens Villes et Sites sont accessibles uniquement en tant qu'administrateur.
-            <a href="#" class="alert-link ms-2">Accéder aux outils d'administration</a>
-        </div>
-    {% endif %}
 {% endblock %}
