@@ -26,4 +26,44 @@ class SiteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Trouve les sites avec pagination et recherche
+     */
+    public function findBySearchPaginated(string $search, int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('s');
+        
+        if (!empty($search)) {
+            $queryBuilder
+                ->where('s.nomSite LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return $queryBuilder
+            ->orderBy('s.nomSite', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les sites avec recherche
+     */
+    public function countBySearch(string $search): int
+    {
+        $queryBuilder = $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)');
+        
+        if (!empty($search)) {
+            $queryBuilder
+                ->where('s.nomSite LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

@@ -1,0 +1,57 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="fas fa-city me-2"></i>
+        {% if isEdit %}
+            Modifier la ville
+        {% else %}
+            Nouvelle ville
+        {% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+{{ form_start(form, {
+    'attr': {
+        'id': 'villeForm',
+        'novalidate': 'novalidate'
+    }
+}) }}
+
+<div class="modal-body">
+    <!-- Messages d'erreur -->
+    <div id="formMessages"></div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.nomVille, null, {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.nomVille) }}
+                {{ form_errors(form.nomVille) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.codePostal, null, {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.codePostal) }}
+                {{ form_errors(form.codePostal) }}
+                <div class="form-text">5 chiffres exactement</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times me-1"></i>Annuler
+    </button>
+    <button type="submit" class="btn btn-primary" id="submitVilleBtn">
+        <i class="fas fa-save me-1"></i>
+        {% if isEdit %}
+            Modifier
+        {% else %}
+            Créer
+        {% endif %}
+    </button>
+</div>
+
+{{ form_end(form) }}

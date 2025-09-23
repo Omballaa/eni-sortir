@@ -41,4 +41,44 @@ class VilleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Trouve les villes avec pagination et recherche
+     */
+    public function findBySearchPaginated(string $search, int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('v');
+        
+        if (!empty($search)) {
+            $queryBuilder
+                ->where('v.nomVille LIKE :search OR v.codePostal LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return $queryBuilder
+            ->orderBy('v.nomVille', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les villes avec recherche
+     */
+    public function countBySearch(string $search): int
+    {
+        $queryBuilder = $this->createQueryBuilder('v')
+            ->select('COUNT(v.id)');
+        
+        if (!empty($search)) {
+            $queryBuilder
+                ->where('v.nomVille LIKE :search OR v.codePostal LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="fas fa-building me-2"></i>
+        {% if isEdit %}
+            Modifier le site
+        {% else %}
+            Nouveau site
+        {% endif %}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+{{ form_start(form, {
+    'attr': {
+        'id': 'siteForm',
+        'novalidate': 'novalidate'
+    }
+}) }}
+
+<div class="modal-body">
+    <!-- Messages d'erreur -->
+    <div id="formMessages"></div>
+
+    <div class="mb-3">
+        {{ form_label(form.nomSite, null, {'label_attr': {'class': 'form-label required'}}) }}
+        {{ form_widget(form.nomSite) }}
+        {{ form_errors(form.nomSite) }}
+        <div class="form-text">Le nom du site organisateur des sorties</div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times me-1"></i>Annuler
+    </button>
+    <button type="submit" class="btn btn-success" id="submitSiteBtn">
+        <i class="fas fa-save me-1"></i>
+        {% if isEdit %}
+            Modifier
+        {% else %}
+            Créer
+        {% endif %}
+    </button>
+</div>
+
+{{ form_end(form) }}
