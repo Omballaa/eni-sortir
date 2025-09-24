@@ -73,47 +73,19 @@
                     </form>
                 </div>
                 <div class="card-footer text-center bg-light">
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Besoin d'aide ? Contactez votre administrateur
-                    </small>
-                </div>
-            </div>
-
-            <!-- Informations de test -->
-            <div class="card mt-4">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">
-                        <i class="bi bi-gear me-2"></i>
-                        Comptes de test
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Administrateur :</strong><br>
-                            <code>admin</code><br>
-                            <small class="text-muted">password123</small>
-                        </div>
-                        <div class="col-6">
-                            <strong>Utilisateur :</strong><br>
-                            <code>jsmith</code><br>
-                            <small class="text-muted">password123</small>
-                        </div>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Besoin d'aide ? Contactez votre administrateur
+                        </small>
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Autres utilisateurs :</strong><br>
-                            <code>mmartin</code><br>
-                            <code>pdurand</code><br>
-                            <code>sleblanc</code>
-                        </div>
-                        <div class="col-6">
-                            <strong>Mot de passe :</strong><br>
-                            <code>password123</code><br>
-                            <small class="text-muted">pour tous</small>
-                        </div>
+                    <hr class="my-2">
+                    <div>
+                        <small class="text-muted me-2">Pas encore de compte ?</small>
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-person-plus me-1"></i>
+                            Créer un compte
+                        </a>
                     </div>
                 </div>
             </div>
