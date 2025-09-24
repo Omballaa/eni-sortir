@@ -11,7 +11,7 @@ class SortieModal {
     }
 
     init() {
-        console.log('🚀 Initialisation SortieModal');
+        devLog('🚀 Initialisation SortieModal');
         
         // Gestion des formulaires de sortie
         document.addEventListener('submit', (e) => {
@@ -29,18 +29,18 @@ class SortieModal {
 
         // Écouter l'événement personnalisé de chargement de modale
         document.addEventListener('modalContentLoaded', (e) => {
-            console.log('📡 Événement modalContentLoaded reçu:', e.detail);
+            devLog('📡 Événement modalContentLoaded reçu:', e.detail);
             const modal = e.detail.modal;
             
             // Vérifier quel formulaire a été chargé et l'initialiser
             if (modal.querySelector('#sortie-create-form')) {
-                console.log('🆕 Formulaire de création détecté');
+                devLog('🆕 Formulaire de création détecté');
                 this.initCreateForm();
             } else if (modal.querySelector('#sortie-edit-form')) {
-                console.log('📝 Formulaire d\'édition détecté');  
+                devLog('📝 Formulaire d\'édition détecté');  
                 this.initEditForm();
             } else if (modal.querySelector('#sortie-cancel-form')) {
-                console.log('❌ Formulaire d\'annulation détecté');
+                devLog('❌ Formulaire d\'annulation détecté');
                 this.initCancelForm();
             }
         });
@@ -56,17 +56,17 @@ class SortieModal {
                     if (node.nodeType === 1) { // Element node
                         // Formulaire de création
                         if (node.querySelector && node.querySelector('#sortie-create-form')) {
-                            console.log('👁️ MutationObserver: Formulaire création détecté');
+                            devLog('👁️ MutationObserver: Formulaire création détecté');
                             this.initCreateForm();
                         }
                         // Formulaire d'édition
                         if (node.querySelector && node.querySelector('#sortie-edit-form')) {
-                            console.log('👁️ MutationObserver: Formulaire édition détecté');
+                            devLog('👁️ MutationObserver: Formulaire édition détecté');
                             this.initEditForm();
                         }
                         // Formulaire d'annulation
                         if (node.querySelector && node.querySelector('#sortie-cancel-form')) {
-                            console.log('👁️ MutationObserver: Formulaire annulation détecté');
+                            devLog('👁️ MutationObserver: Formulaire annulation détecté');
                             this.initCancelForm();
                         }
                     }
@@ -95,9 +95,9 @@ class SortieModal {
      * Ouvre la modale d'affichage d'une sortie
      */
     openSortieModal(sortieId) {
-        console.log('openSortieModal appelé avec sortieId:', sortieId);
+        devLog('openSortieModal appelé avec sortieId:', sortieId);
         const url = `/sortie/${sortieId}/modal`;
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'sortieModal', 'xl');
     }
@@ -106,9 +106,9 @@ class SortieModal {
      * Ouvre la modale de création d'une sortie
      */
     openSortieCreateModal() {
-        console.log('openSortieCreateModal appelé');
+        devLog('openSortieCreateModal appelé');
         const url = '/sortie/nouvelle/modal';
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'sortieCreateModal', 'lg');
     }
@@ -117,7 +117,7 @@ class SortieModal {
      * Ouvre la modale d'édition d'une sortie
      */
     openSortieEditModal(sortieId) {
-        console.log('openSortieEditModal appelé avec sortieId:', sortieId);
+        devLog('openSortieEditModal appelé avec sortieId:', sortieId);
         
         // Fermer la modale actuelle si elle existe
         const currentModal = document.querySelector('.modal.show');
@@ -143,7 +143,7 @@ class SortieModal {
      */
     doOpenSortieEditModal(sortieId) {
         const url = `/sortie/${sortieId}/modifier/modal`;
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'sortieEditModal', 'lg');
     }
@@ -152,7 +152,7 @@ class SortieModal {
      * Ouvre la modale d'annulation d'une sortie
      */
     openSortieCancelModal(sortieId) {
-        console.log('openSortieCancelModal appelé avec sortieId:', sortieId);
+        devLog('openSortieCancelModal appelé avec sortieId:', sortieId);
         
         // Fermer la modale actuelle si elle existe
         const currentModal = document.querySelector('.modal.show');
@@ -178,7 +178,7 @@ class SortieModal {
      */
     doOpenSortieCancelModal(sortieId) {
         const url = `/sortie/${sortieId}/annuler/modal`;
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'sortieCancelModal', 'md');
     }
@@ -187,32 +187,32 @@ class SortieModal {
      * Initialise le formulaire de création
      */
     initCreateForm() {
-        console.log('🆕 === DÉBUT initCreateForm ===');
+        devLog('🆕 === DÉBUT initCreateForm ===');
         const form = document.getElementById('sortie-create-form');
         if (!form) {
-            console.log('❌ Formulaire de création non trouvé');
+            devLog('❌ Formulaire de création non trouvé');
             return;
         }
 
-        console.log('✅ Formulaire création trouvé:', form.id);
+        devLog('✅ Formulaire création trouvé:', form.id);
         this.initCommonFormFeatures(form);
         this.setupDateTimeValidation(form);
         this.setupLieuxLoading(form);
-        console.log('🆕 === FIN initCreateForm ===');
+        devLog('🆕 === FIN initCreateForm ===');
     }
 
     /**
      * Initialise le formulaire d'édition
      */
     initEditForm() {
-        console.log('📝 === DÉBUT initEditForm ===');
+        devLog('📝 === DÉBUT initEditForm ===');
         const form = document.getElementById('sortie-edit-form');
         if (!form) {
-            console.log('❌ Formulaire d\'édition non trouvé');
+            devLog('❌ Formulaire d\'édition non trouvé');
             return;
         }
 
-        console.log('✅ Formulaire édition trouvé:', form.id);
+        devLog('✅ Formulaire édition trouvé:', form.id);
         
         // 1. Charger les données originales AVANT tout le reste
         this.loadOriginalSortieData(form);
@@ -226,31 +226,31 @@ class SortieModal {
         // 4. Configurer le chargement des lieux (après les données originales)
         this.setupLieuxLoading(form);
         
-        console.log('📝 === FIN initEditForm ===');
+        devLog('📝 === FIN initEditForm ===');
     }
 
     /**
      * Initialise le formulaire d'annulation
      */
     initCancelForm() {
-        console.log('❌ === DÉBUT initCancelForm ===');
+        devLog('❌ === DÉBUT initCancelForm ===');
         const form = document.getElementById('sortie-cancel-form');
         if (!form) {
-            console.log('❌ Formulaire d\'annulation non trouvé');
+            devLog('❌ Formulaire d\'annulation non trouvé');
             return;
         }
 
-        console.log('✅ Formulaire annulation trouvé:', form.id);
+        devLog('✅ Formulaire annulation trouvé:', form.id);
 
         // Chercher le textarea par différents sélecteurs
         const motifField = form.querySelector('textarea[name*="motifAnnulation"]') || 
                           form.querySelector('textarea[id*="motifAnnulation"]') || 
                           form.querySelector('textarea');
 
-        console.log('Champ motif trouvé:', motifField);
+        devLog('Champ motif trouvé:', motifField);
         
         if (motifField) {
-            console.log('✅ Initialisation validation motif');
+            devLog('✅ Initialisation validation motif');
             motifField.addEventListener('input', () => {
                 const charCount = motifField.value.length;
                 let feedback = motifField.parentNode.querySelector('.char-feedback');
@@ -269,9 +269,9 @@ class SortieModal {
                 }
             });
         } else {
-            console.log('❌ Champ motif non trouvé');
+            devLog('❌ Champ motif non trouvé');
         }
-        console.log('❌ === FIN initCancelForm ===');
+        devLog('❌ === FIN initCancelForm ===');
     }
 
     /**
@@ -290,8 +290,8 @@ class SortieModal {
      * Configure le chargement dynamique des lieux
      */
     setupLieuxLoading(form) {
-        console.log('=== DÉBUT setupLieuxLoading ===');
-        console.log('Form ID:', form.id);
+        devLog('=== DÉBUT setupLieuxLoading ===');
+        devLog('Form ID:', form.id);
         
         // Essayer différents sélecteurs pour trouver les champs ville et lieu
         const villeSelect = form.querySelector('select[name*="ville"]') || 
@@ -302,15 +302,15 @@ class SortieModal {
                           form.querySelector('[id*="lieu"]') ||
                           form.querySelector('#sortie_lieu');
         
-        console.log('Sélecteurs testés:');
-        console.log('- select[name*="ville"]:', form.querySelector('select[name*="ville"]'));
-        console.log('- [id*="ville"]:', form.querySelector('[id*="ville"]'));
-        console.log('- #sortie_ville:', form.querySelector('#sortie_ville'));
-        console.log('- select[name*="lieu"]:', form.querySelector('select[name*="lieu"]'));
-        console.log('- [id*="lieu"]:', form.querySelector('[id*="lieu"]'));
-        console.log('- #sortie_lieu:', form.querySelector('#sortie_lieu'));
+        devLog('Sélecteurs testés:');
+        devLog('- select[name*="ville"]:', form.querySelector('select[name*="ville"]'));
+        devLog('- [id*="ville"]:', form.querySelector('[id*="ville"]'));
+        devLog('- #sortie_ville:', form.querySelector('#sortie_ville'));
+        devLog('- select[name*="lieu"]:', form.querySelector('select[name*="lieu"]'));
+        devLog('- [id*="lieu"]:', form.querySelector('[id*="lieu"]'));
+        devLog('- #sortie_lieu:', form.querySelector('#sortie_lieu'));
         
-        console.log('Éléments trouvés:', {
+        devLog('Éléments trouvés:', {
             villeSelect: villeSelect?.id || villeSelect?.name,
             lieuSelect: lieuSelect?.id || lieuSelect?.name,
             formId: form.id,
@@ -321,55 +321,55 @@ class SortieModal {
         });
         
         if (villeSelect && lieuSelect) {
-            console.log('✓ Configuration chargement lieux pour:', form.id);
+            devLog('✓ Configuration chargement lieux pour:', form.id);
             
             // Écouter les changements de ville
             villeSelect.addEventListener('change', (e) => {
                 const villeId = e.target.value;
-                console.log('🔄 CHANGEMENT VILLE détecté:', villeId);
+                devLog('🔄 CHANGEMENT VILLE détecté:', villeId);
                 this.loadLieuxForVille(villeId, lieuSelect);
             });
 
             // Chargement initial pour l'édition ou si une ville est déjà sélectionnée
             if (villeSelect.value) {
-                console.log('📋 Ville présélectionnée:', villeSelect.value);
+                devLog('📋 Ville présélectionnée:', villeSelect.value);
                 if (form.id === 'sortie-edit-form') {
                     // Pour l'édition, récupérer les données originales
                     const originalData = this.getOriginalSortieData();
-                    console.log('📝 Données originales édition:', originalData);
+                    devLog('📝 Données originales édition:', originalData);
                     this.loadLieuxForVille(villeSelect.value, lieuSelect, originalData?.lieuId);
                 } else {
                     // Pour la création, juste charger les lieux sans sélection
-                    console.log('🆕 Mode création - chargement lieux');
+                    devLog('🆕 Mode création - chargement lieux');
                     this.loadLieuxForVille(villeSelect.value, lieuSelect);
                 }
             } else {
-                console.log('❌ Pas de ville sélectionnée - désactivation lieu');
+                devLog('❌ Pas de ville sélectionnée - désactivation lieu');
                 // Pas de ville sélectionnée : s'assurer que le lieu est désactivé
                 lieuSelect.disabled = true;
                 lieuSelect.innerHTML = '<option value="">Sélectionner d\'abord une ville</option>';
             }
         } else {
-            console.error('❌ Éléments ville ou lieu non trouvés dans le formulaire', form.id);
-            console.log('Tous les selects dans le form:');
+            logger.error('❌ Éléments ville ou lieu non trouvés dans le formulaire', form.id);
+            devLog('Tous les selects dans le form:');
             const allSelects = form.querySelectorAll('select');
             allSelects.forEach((select, index) => {
-                console.log(`Select ${index}:`, {
+                devLog(`Select ${index}:`, {
                     id: select.id,
                     name: select.name,
                     classes: select.className
                 });
             });
         }
-        console.log('=== FIN setupLieuxLoading ===');
+        devLog('=== FIN setupLieuxLoading ===');
     }
 
     /**
      * Charge les lieux pour une ville donnée
      */
     loadLieuxForVille(villeId, lieuSelect, selectLieuId = null) {
-        console.log('🏙️ === DÉBUT loadLieuxForVille ===');
-        console.log('Paramètres:', {
+        devLog('🏙️ === DÉBUT loadLieuxForVille ===');
+        devLog('Paramètres:', {
             villeId,
             lieuSelectId: lieuSelect?.id,
             selectLieuId,
@@ -381,7 +381,7 @@ class SortieModal {
         lieuSelect.disabled = true;
         
         if (!villeId) {
-            console.log('❌ Pas de villeId - arrêt');
+            devLog('❌ Pas de villeId - arrêt');
             lieuSelect.innerHTML = '<option value="">Sélectionner d\'abord une ville</option>';
             lieuSelect.disabled = true;
             return;
@@ -389,7 +389,7 @@ class SortieModal {
         
         // URL relative pour éviter les problèmes de base URL
         const url = `/lieu/by-ville?ville=${villeId}`;
-        console.log('🌐 URL de chargement:', url);
+        devLog('🌐 URL de chargement:', url);
         
         fetch(url, {
             method: 'GET',
@@ -398,7 +398,7 @@ class SortieModal {
             }
         })
         .then(response => {
-            console.log('📡 Réponse reçue:', {
+            devLog('📡 Réponse reçue:', {
                 status: response.status,
                 statusText: response.statusText,
                 ok: response.ok
@@ -409,13 +409,13 @@ class SortieModal {
             return response.json();
         })
         .then(lieux => {
-            console.log('🏢 Lieux reçus:', lieux);
-            console.log('Nombre de lieux:', lieux.length);
+            devLog('🏢 Lieux reçus:', lieux);
+            devLog('Nombre de lieux:', lieux.length);
             
             lieuSelect.innerHTML = '<option value="">Sélectionner un lieu...</option>';
             
             lieux.forEach((lieu, index) => {
-                console.log(`Lieu ${index}:`, lieu);
+                devLog(`Lieu ${index}:`, lieu);
                 const option = document.createElement('option');
                 option.value = lieu.id;
                 option.textContent = `${lieu.nomLieu} - ${lieu.rue}`;
@@ -423,7 +423,7 @@ class SortieModal {
                 // Sélectionner le lieu spécifique si fourni
                 if (selectLieuId && lieu.id == selectLieuId) {
                     option.selected = true;
-                    console.log('✅ Lieu sélectionné:', lieu.nomLieu);
+                    devLog('✅ Lieu sélectionné:', lieu.nomLieu);
                 }
                 
                 lieuSelect.appendChild(option);
@@ -431,15 +431,15 @@ class SortieModal {
             
             // IMPORTANT: Réactiver le champ lieu après le chargement
             lieuSelect.disabled = false;
-            console.log('✅ Champ lieu réactivé avec', lieux.length, 'options');
-            console.log('État final lieu select:', {
+            devLog('✅ Champ lieu réactivé avec', lieux.length, 'options');
+            devLog('État final lieu select:', {
                 disabled: lieuSelect.disabled,
                 optionsCount: lieuSelect.options.length,
                 selectedIndex: lieuSelect.selectedIndex
             });
         })
         .catch(error => {
-            console.error('❌ Erreur chargement lieux:', error);
+            logger.error('❌ Erreur chargement lieux:', error);
             lieuSelect.innerHTML = '<option value="">Erreur de chargement</option>';
             lieuSelect.disabled = true;
             if (typeof showToast === 'function') {
@@ -447,7 +447,7 @@ class SortieModal {
             }
         })
         .finally(() => {
-            console.log('🏙️ === FIN loadLieuxForVille ===');
+            devLog('🏙️ === FIN loadLieuxForVille ===');
         });
     }
 
@@ -460,7 +460,7 @@ class SortieModal {
             try {
                 return JSON.parse(dataScript.textContent);
             } catch (e) {
-                console.error('Erreur parsing données originales:', e);
+                logger.error('Erreur parsing données originales:', e);
             }
         }
         return null;
@@ -470,10 +470,10 @@ class SortieModal {
      * Charge les données originales pour la restauration
      */
     loadOriginalSortieData(form) {
-        console.log('📋 === DÉBUT loadOriginalSortieData ===');
+        devLog('📋 === DÉBUT loadOriginalSortieData ===');
         const originalData = this.getOriginalSortieData();
         if (originalData) {
-            console.log('✅ Données originales chargées:', originalData);
+            devLog('✅ Données originales chargées:', originalData);
             
             // Stocker sur le formulaire pour usage ultérieur
             form.originalData = originalData;
@@ -484,17 +484,17 @@ class SortieModal {
             // Exposer la fonction de restauration globalement
             window.loadOriginalData = () => this.restoreOriginalData(form);
         } else {
-            console.log('❌ Pas de données originales trouvées');
+            devLog('❌ Pas de données originales trouvées');
         }
-        console.log('📋 === FIN loadOriginalSortieData ===');
+        devLog('📋 === FIN loadOriginalSortieData ===');
     }
 
     /**
      * Force les valeurs initiales pour l'édition
      */
     setInitialEditValues(form, originalData) {
-        console.log('🔧 === DÉBUT setInitialEditValues ===');
-        console.log('Données à appliquer:', originalData);
+        devLog('🔧 === DÉBUT setInitialEditValues ===');
+        devLog('Données à appliquer:', originalData);
         
         // Trouver le select ville
         const villeSelect = form.querySelector('select[name*="ville"]') || 
@@ -502,27 +502,27 @@ class SortieModal {
                            form.querySelector('#sortie_ville');
         
         if (villeSelect && originalData.villeId) {
-            console.log('🏙️ Forçage sélection ville:', originalData.villeId);
-            console.log('Options ville disponibles:');
+            devLog('🏙️ Forçage sélection ville:', originalData.villeId);
+            devLog('Options ville disponibles:');
             Array.from(villeSelect.options).forEach((option, index) => {
-                console.log(`  Option ${index}: value="${option.value}" text="${option.text}"`);
+                devLog(`  Option ${index}: value="${option.value}" text="${option.text}"`);
             });
             
             // Forcer la valeur
             villeSelect.value = originalData.villeId;
-            console.log('Ville après forçage:', villeSelect.value);
+            devLog('Ville après forçage:', villeSelect.value);
             
             // Déclencher l'événement change si la valeur a bien été définie
             if (villeSelect.value == originalData.villeId) {
-                console.log('🎯 Déclenchement événement change ville');
+                devLog('🎯 Déclenchement événement change ville');
                 villeSelect.dispatchEvent(new Event('change'));
             } else {
-                console.log('❌ Impossible de définir la ville - valeur non trouvée');
+                devLog('❌ Impossible de définir la ville - valeur non trouvée');
             }
         } else {
-            console.log('❌ Select ville non trouvé ou villeId manquant');
+            devLog('❌ Select ville non trouvé ou villeId manquant');
         }
-        console.log('🔧 === FIN setInitialEditValues ===');
+        devLog('🔧 === FIN setInitialEditValues ===');
     }
 
     /**
@@ -532,7 +532,7 @@ class SortieModal {
         const originalData = form.originalData;
         if (!originalData) return;
 
-        console.log('Restauration des données originales');
+        devLog('Restauration des données originales');
         
         // Restaurer les champs texte
         const fields = {
@@ -673,7 +673,7 @@ class SortieModal {
                           form.querySelector('textarea');
         const confirmCheckbox = form.querySelector('#confirm-cancel');
         
-        console.log('Éléments trouvés:', {
+        devLog('Éléments trouvés:', {
             motifField: motifField,
             motifFieldValue: motifField ? motifField.value : 'N/A',
             confirmCheckbox: confirmCheckbox,
@@ -681,13 +681,13 @@ class SortieModal {
         });
         
         if (!motifField) {
-            console.error('❌ Champ motif non trouvé');
+            logger.error('❌ Champ motif non trouvé');
             showToast('Erreur: champ motif non trouvé', 'error');
             return;
         }
         
         if (!confirmCheckbox) {
-            console.error('❌ Checkbox de confirmation non trouvée');
+            logger.error('❌ Checkbox de confirmation non trouvée');
             showToast('Erreur: checkbox de confirmation non trouvée', 'error');
             return;
         }
@@ -743,7 +743,7 @@ class SortieModal {
 
             return data;
         } catch (error) {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Erreur de connexion</div>';
             showToast('Erreur de connexion', 'error');
             throw error;
@@ -819,7 +819,7 @@ class SortieModal {
             }
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             showToast('Erreur lors de l\'inscription/désinscription', 'error');
         });
     }
@@ -856,7 +856,7 @@ class SortieModal {
             }
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('Erreur:', error);
             showToast('Erreur lors de la publication', 'error');
         });
     }
@@ -865,8 +865,69 @@ class SortieModal {
      * Rafraîchit le contenu de la modale ouverte
      */
     refreshModalContent() {
-        // Cette méthode n'est plus utilisée - nous utilisons refreshSortiesList() maintenant
-        console.log('refreshModalContent: méthode dépréciée, utilisez refreshSortiesList()');
+        // Identifier la modale actuellement ouverte
+        const openModal = document.querySelector('.modal.show');
+        if (!openModal) {
+            devLog('Aucune modale ouverte à rafraîchir');
+            return;
+        }
+
+        // Extraire l'ID de la sortie depuis les boutons d'action
+        const inscriptionBtn = openModal.querySelector('button[onclick*="inscriptionAction"]');
+        if (!inscriptionBtn) {
+            devLog('Pas de bouton d\'inscription trouvé dans la modale');
+            return;
+        }
+
+        // Extraire l'ID de la sortie depuis l'onclick
+        const onclickAttr = inscriptionBtn.getAttribute('onclick');
+        const sortieIdMatch = onclickAttr.match(/inscriptionAction\((\d+),/);
+        if (!sortieIdMatch) {
+            devLog('ID de sortie introuvable');
+            return;
+        }
+
+        const sortieId = sortieIdMatch[1];
+        devLog('Rafraîchissement de la modale pour la sortie:', sortieId);
+
+        // Recharger le contenu de la modale
+        const modalContent = openModal.querySelector('.modal-content');
+        if (modalContent) {
+            // Afficher un indicateur de chargement
+            const loadingHTML = `
+                <div class="modal-body text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Actualisation...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Actualisation...</p>
+                </div>
+            `;
+            modalContent.innerHTML = loadingHTML;
+
+            // Charger le nouveau contenu
+            fetch(`/sortie/${sortieId}/modal`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalContent.innerHTML = html;
+                devLog('Contenu de la modale rafraîchi');
+            })
+            .catch(error => {
+                logger.error('Erreur lors du rafraîchissement:', error);
+                modalContent.innerHTML = `
+                    <div class="modal-body text-center py-4">
+                        <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
+                        <h5 class="mt-3">Erreur de rafraîchissement</h5>
+                        <p class="text-muted">Impossible de mettre à jour le contenu.</p>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                `;
+            });
+        }
     }
 
     /**
@@ -947,7 +1008,7 @@ class SortieModal {
         const form = document.getElementById(formId);
         if (!form) return;
 
-        console.log('Reset formulaire:', formId);
+        devLog('Reset formulaire:', formId);
         
         // Reset natif du formulaire
         form.reset();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html{% if app.environment == 'dev' %} data-env-dev{% endif %}>
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}ENI Sortir{% endblock %}</title>

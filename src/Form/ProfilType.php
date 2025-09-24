@@ -10,7 +10,6 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -106,13 +105,8 @@ class ProfilType extends AbstractType
                         'placeholder' => 'Confirmez votre mot de passe'
                     ]
                 ],
-                'invalid_message' => 'Les mots de passe doivent être identiques.',
-                'constraints' => [
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères'
-                    ])
-                ]
+                'invalid_message' => 'Les mots de passe doivent être identiques.'
+                // Pas de contraintes ici, on les gérera dans le contrôleur
             ])
             ->add('site', EntityType::class, [
                 'class' => Site::class,
@@ -136,23 +130,13 @@ class ProfilType extends AbstractType
                 'constraints' => [
                     new File([
                         'maxSize' => '2M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif',
-                            'image/webp'
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG, GIF, WebP)',
+                        // mimeTypes supprimés temporairement car nécessite l'extension fileinfo
+                        // La validation se fait maintenant côté contrôleur par l'extension
                         'maxSizeMessage' => 'La taille de l\'image ne doit pas dépasser 2MB'
                     ])
                 ]
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer',
-                'attr' => [
-                    'class' => 'btn btn-primary'
-                ]
             ]);
+            // Bouton submit supprimé car géré manuellement dans les templates
     }
 
     public function configureOptions(OptionsResolver $resolver): void

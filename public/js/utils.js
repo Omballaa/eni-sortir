@@ -3,6 +3,88 @@
  */
 
 /**
+ * Système de logging conditionnel
+ * N'affiche les logs qu'en mode développement
+ */
+class DevLogger {
+    constructor() {
+        this.isDev = this.detectDevelopmentMode();
+    }
+    
+    /**
+     * Détecte si on est en mode développement
+     * @returns {boolean}
+     */
+    detectDevelopmentMode() {
+        // Méthodes pour détecter le mode développement :
+        // 1. URL localhost/127.0.0.1
+        const isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+        
+        // 2. Port de développement Symfony (8000 par défaut)
+        const isDevPort = window.location.port === '8000';
+        
+        // 3. Variable d'environnement (peut être définie côté serveur)
+        const hasDevFlag = document.documentElement.hasAttribute('data-env-dev');
+        
+        // 4. Debug dans l'URL
+        const hasDebugParam = new URLSearchParams(window.location.search).has('debug');
+        
+        return isLocalhost || isDevPort || hasDevFlag || hasDebugParam;
+    }
+    
+    /**
+     * Log conditionnel - n'affiche qu'en développement
+     */
+    log(...args) {
+        if (this.isDev) {
+            console.log(...args);
+        }
+    }
+    
+    /**
+     * Error log - toujours affiché (même en prod pour les erreurs critiques)
+     */
+    error(...args) {
+        console.error(...args);
+    }
+    
+    /**
+     * Warning log - n'affiche qu'en développement
+     */
+    warn(...args) {
+        if (this.isDev) {
+            console.warn(...args);
+        }
+    }
+    
+    /**
+     * Info log - n'affiche qu'en développement
+     */
+    info(...args) {
+        if (this.isDev) {
+            console.info(...args);
+        }
+    }
+    
+    /**
+     * Debug log - n'affiche qu'en développement
+     */
+    debug(...args) {
+        if (this.isDev) {
+            console.debug(...args);
+        }
+    }
+}
+
+// Instance globale du logger
+const logger = new DevLogger();
+
+// Fonction raccourci globale
+function devLog(...args) {
+    logger.log(...args);
+}
+
+/**
  * Affiche un toast de notification
  * @param {string} message - Message à afficher
  * @param {string} type - Type de toast: 'success', 'error', 'warning', 'info'
@@ -73,7 +155,7 @@ function refreshAjax(url, targetSelector, callback = null) {
     const targetElement = document.querySelector(targetSelector);
     
     if (!targetElement) {
-        console.error('Élément cible non trouvé:', targetSelector);
+        logger.error('Élément cible non trouvé:', targetSelector);
         showToast('Erreur de refresh AJAX', 'error');
         return;
     }
@@ -110,7 +192,7 @@ function refreshAjax(url, targetSelector, callback = null) {
         }
     })
     .catch(error => {
-        console.error('Erreur lors du refresh AJAX:', error);
+        logger.error('Erreur lors du refresh AJAX:', error);
         targetElement.innerHTML = originalContent;
         showToast('Erreur lors de l\'actualisation', 'error');
     });
@@ -123,15 +205,39 @@ function refreshAjax(url, targetSelector, callback = null) {
  * @param {string} size - Taille de la modale: 'sm', 'lg', 'xl' (défaut: 'lg')
  */
 function showModal(url, modalId = 'universalModal', size = 'lg') {
-    console.log('showModal appelé avec URL:', url, 'modalId:', modalId, 'size:', size);
+    devLog('showModal appelé avec URL:', url, 'modalId:', modalId, 'size:', size);
     
     // Créer ou récupérer la modale universelle
     let modal = document.getElementById(modalId);
     if (!modal) {
-        console.log('Création d\'une nouvelle modale avec ID:', modalId);
+        devLog('Création d\'une nouvelle modale avec ID:', modalId);
         modal = createModal(modalId, size);
     } else {
-        console.log('Réutilisation de la modale existante:', modalId);
+        devLog('Réutilisation de la modale existante:', modalId);
+    }
+
+    // Vérifier s'il y a déjà d'autres modales ouvertes pour ajuster le z-index
+    const existingModals = document.querySelectorAll('.modal.show');
+    if (existingModals.length > 0) {
+        // Calculer le z-index le plus élevé des modales existantes
+        let maxZIndex = 1050; // z-index par défaut de Bootstrap pour les modales
+        existingModals.forEach(existingModal => {
+            const computedStyle = window.getComputedStyle(existingModal);
+            const zIndex = parseInt(computedStyle.zIndex) || 1050;
+            maxZIndex = Math.max(maxZIndex, zIndex);
+        });
+        
+        // Définir un z-index plus élevé pour la nouvelle modale
+        modal.style.zIndex = maxZIndex + 10;
+        devLog(`Z-index ajusté pour la modale ${modalId}: ${maxZIndex + 10}`);
+        
+        // Aussi ajuster le backdrop si nécessaire
+        setTimeout(() => {
+            const backdrop = document.querySelector('.modal-backdrop:last-child');
+            if (backdrop) {
+                backdrop.style.zIndex = maxZIndex + 5;
+            }
+        }, 100);
     }
     
     const modalContent = modal.querySelector('.modal-content');
@@ -149,7 +255,7 @@ function showModal(url, modalId = 'universalModal', size = 'lg') {
     // Ouvrir la modale
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
-    console.log('Modale affichée, début du chargement AJAX');
+    devLog('Modale affichée, début du chargement AJAX');
     
     // Charger le contenu via AJAX
     fetch(url, {
@@ -159,14 +265,14 @@ function showModal(url, modalId = 'universalModal', size = 'lg') {
         }
     })
     .then(response => {
-        console.log('Réponse AJAX reçue, status:', response.status);
+        devLog('Réponse AJAX reçue, status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
         return response.text();
     })
     .then(html => {
-        console.log('Contenu HTML reçu, longueur:', html.length);
+        devLog('Contenu HTML reçu, longueur:', html.length);
         modalContent.innerHTML = html;
         
         // Initialiser les formulaires AJAX dans la modale
@@ -183,13 +289,13 @@ function showModal(url, modalId = 'universalModal', size = 'lg') {
                 }
             });
             document.dispatchEvent(event);
-            console.log('🎯 Événement modalContentLoaded émis pour:', modal.id);
+            devLog('🎯 Événement modalContentLoaded émis pour:', modal.id);
         }, 10);
         
-        console.log('Contenu de la modale chargé avec succès');
+        devLog('Contenu de la modale chargé avec succès');
     })
     .catch(error => {
-        console.error('Erreur lors du chargement de la modale:', error);
+        logger.error('Erreur lors du chargement de la modale:', error);
         modalContent.innerHTML = `
             <div class="modal-body text-center py-5">
                 <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
@@ -219,6 +325,13 @@ function createModal(modalId, size = 'lg') {
             </div>
         </div>
     `;
+    
+    // Ajouter un écouteur pour nettoyer le z-index quand la modale se ferme
+    modal.addEventListener('hidden.bs.modal', function() {
+        devLog('Modale fermée, réinitialisation du z-index:', modalId);
+        modal.style.zIndex = '';
+    });
+    
     document.body.appendChild(modal);
     return modal;
 }
@@ -308,7 +421,7 @@ function submitModalForm(form) {
         }
     })
     .catch(error => {
-        console.error('Erreur lors de la soumission:', error);
+        logger.error('Erreur lors de la soumission:', error);
         showToast('Une erreur est survenue lors de l\'enregistrement.', 'error');
     })
     .finally(() => {
@@ -356,13 +469,13 @@ document.addEventListener('DOMContentLoaded', function() {
  * Rafraîchit la liste des sorties du dashboard
  */
 function refreshSortiesList() {
-    console.log('🔄 Début refreshSortiesList');
+    devLog('🔄 Début refreshSortiesList');
     const container = document.getElementById('sorties-container');
     if (!container) {
-        console.warn('Container sorties-container not found');
+        logger.warn('Container sorties-container not found');
         return;
     }
-    console.log('✅ Container trouvé:', container);
+    devLog('✅ Container trouvé:', container);
 
     // Récupérer les filtres actuels du formulaire
     const form = document.querySelector('form[method="get"]') || document.querySelector('form');
@@ -385,9 +498,9 @@ function refreshSortiesList() {
             }
         });
         
-        console.log('Paramètres de recherche:', params.toString());
+        devLog('Paramètres de recherche:', params.toString());
     } else {
-        console.warn('Formulaire de filtres non trouvé');
+        logger.warn('Formulaire de filtres non trouvé');
     }
 
     // Ajouter un indicateur de chargement
@@ -395,7 +508,7 @@ function refreshSortiesList() {
     container.style.pointerEvents = 'none';
     
     const fullUrl = `/dashboard/refresh?${params.toString()}`;
-    console.log('🌐 URL de requête:', fullUrl);
+    devLog('🌐 URL de requête:', fullUrl);
     
     // Effectuer la requête AJAX
     fetch(fullUrl, {
@@ -429,10 +542,10 @@ function refreshSortiesList() {
         }, 50);
         
         // Pas de message toast pour éviter le spam lors des actions multiples
-        console.log('✅ Liste des sorties mise à jour');
+        devLog('✅ Liste des sorties mise à jour');
     })
     .catch(error => {
-        console.error('Erreur lors du refresh des sorties:', error);
+        logger.error('Erreur lors du refresh des sorties:', error);
         container.style.opacity = '1';
         container.style.pointerEvents = 'auto';
         showToast('Erreur lors de la mise à jour de la liste', 'error');
@@ -478,6 +591,6 @@ function updateSortiesCount() {
             badge.style.opacity = '1';
         }, 100);
         
-        console.log(`✅ Badge mis à jour: ${count} sorties`);
+        devLog(`✅ Badge mis à jour: ${count} sorties`);
     }
 }

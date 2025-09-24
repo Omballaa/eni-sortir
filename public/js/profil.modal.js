@@ -18,15 +18,24 @@ class ProfilModal {
                 this.handleProfilEdit(e.target);
             }
         });
+
+        // Écouter l'événement de chargement du contenu modal
+        document.addEventListener('modalContentLoaded', (e) => {
+            const modal = e.detail.modal;
+            if (modal && (modal.id === 'profilEditModal' || modal.querySelector('#profil-edit-form'))) {
+                devLog('Initialisation du formulaire de profil pour la modale:', modal.id);
+                this.initEditForm();
+            }
+        });
     }
 
     /**
      * Ouvre la modale d'affichage du profil
      */
     openProfilModal(userId) {
-        console.log('openProfilModal appelé avec userId:', userId);
+        devLog('openProfilModal appelé avec userId:', userId);
         const url = `/profil/${userId}/modal`;
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'profilModal', 'lg');
     }
@@ -35,9 +44,9 @@ class ProfilModal {
      * Ouvre la modale d'édition du profil
      */
     openProfilEditModal(userId) {
-        console.log('openProfilEditModal appelé avec userId:', userId);
+        devLog('openProfilEditModal appelé avec userId:', userId);
         const url = `/profil/${userId}/edit/modal`;
-        console.log('URL générée:', url);
+        devLog('URL générée:', url);
         
         showModal(url, 'profilEditModal', 'lg');
     }
@@ -75,13 +84,18 @@ class ProfilModal {
      * Gère la soumission du formulaire d'édition
      */
     handleProfilEdit(form) {
+        devLog('handleProfilEdit - Début de traitement du formulaire');
+        
         if (!this.validateForm(form)) {
+            devLog('handleProfilEdit - Validation côté client échouée');
             return;
         }
 
         const formData = new FormData(form);
         const resultDiv = document.getElementById('form-result');
         const submitBtn = form.querySelector('button[type="submit"]');
+        
+        devLog('handleProfilEdit - Données du formulaire:', ...formData.entries());
         
         // État de chargement
         this.setLoadingState(submitBtn, true);
@@ -92,18 +106,33 @@ class ProfilModal {
             body: formData,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
+                // Ne pas définir Content-Type pour FormData avec fichiers
+                // Le navigateur le définira automatiquement avec boundary
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            devLog('handleProfilEdit - Réponse reçue, status:', response.status);
+            if (!response.ok) {
+                // Si la réponse n'est pas OK, essayons de lire le contenu comme text
+                return response.text().then(text => {
+                    logger.error('handleProfilEdit - Erreur serveur (HTML):', text.substring(0, 500));
+                    throw new Error(`Erreur serveur ${response.status}: ${text.substring(0, 200)}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
+            devLog('handleProfilEdit - Données JSON reçues:', data);
             if (data.success) {
                 resultDiv.innerHTML = `<div class="alert alert-success"><i class="bi bi-check-circle"></i> ${data.message}</div>`;
                 showToast('Profil mis à jour avec succès !', 'success');
                 
                 // Fermer la modale après 2 secondes
                 setTimeout(() => {
-                    if (this.currentModal) {
-                        this.currentModal.hide();
+                    const modal = document.querySelector('#profilEditModal');
+                    if (modal) {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) bsModal.hide();
                     }
                     // Rafraîchir la page ou le profil affiché
                     this.refreshProfilData();
@@ -112,6 +141,8 @@ class ProfilModal {
                 resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ${data.message}</div>`;
                 showToast('Erreur lors de la mise à jour', 'error');
                 
+                devLog('handleProfilEdit - Erreurs détectées:', data.errors);
+                
                 // Afficher les erreurs de validation
                 if (data.errors) {
                     this.displayFormErrors(form, data.errors);
@@ -119,7 +150,7 @@ class ProfilModal {
             }
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            logger.error('handleProfilEdit - Erreur:', error);
             resultDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Erreur de connexion</div>';
             showToast('Erreur de connexion', 'error');
         })
@@ -132,11 +163,16 @@ class ProfilModal {
      * Validation du formulaire
      */
     validateForm(form) {
+        devLog('validateForm - Début validation côté client');
         let isValid = true;
         const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
         
+        devLog('validateForm - Champs requis trouvés:', requiredFields.length);
+        
         requiredFields.forEach(field => {
-            if (!this.validateField(field)) {
+            const fieldValid = this.validateField(field);
+            devLog(`validateForm - Champ ${field.name}: ${fieldValid ? 'valide' : 'invalide'}`);
+            if (!fieldValid) {
                 isValid = false;
             }
         });
@@ -144,11 +180,14 @@ class ProfilModal {
         // Validation spécifique des mots de passe
         const passwordFields = form.querySelectorAll('input[type="password"]');
         if (passwordFields.length === 2) {
-            if (!this.validatePasswords(passwordFields)) {
+            const passwordsValid = this.validatePasswords(passwordFields);
+            devLog('validateForm - Mots de passe:', passwordsValid ? 'valides' : 'invalides');
+            if (!passwordsValid) {
                 isValid = false;
             }
         }
 
+        devLog('validateForm - Résultat final:', isValid);
         return isValid;
     }
 
@@ -266,9 +305,29 @@ class ProfilModal {
         // Créer le preview
         const reader = new FileReader();
         reader.onload = (e) => {
-            const preview = document.querySelector('.img-thumbnail');
+            let preview = document.querySelector('.img-thumbnail');
+            if (!preview) {
+                // Si pas d'image existante, créer l'élément img
+                const container = document.querySelector('.col-md-4.text-center .mb-3');
+                const noImageDiv = container.querySelector('.bg-light.rounded-circle');
+                if (noImageDiv) {
+                    noImageDiv.remove();
+                }
+                
+                preview = document.createElement('img');
+                preview.className = 'img-thumbnail rounded-circle';
+                preview.style.width = '150px';
+                preview.style.height = '150px';
+                preview.style.objectFit = 'cover';
+                preview.alt = 'Aperçu de la photo';
+                
+                const labelElement = container.querySelector('.form-label');
+                labelElement.insertAdjacentElement('afterend', preview);
+            }
+            
             if (preview) {
                 preview.src = e.target.result;
+                devLog('Preview de l\'image mis à jour');
             }
         };
         reader.readAsDataURL(file);
@@ -312,7 +371,7 @@ class ProfilModal {
      */
     refreshProfilData() {
         // Cette méthode n'est plus utilisée avec le système de modales
-        console.log('refreshProfilData: méthode dépréciée pour les modales');
+        devLog('refreshProfilData: méthode dépréciée pour les modales');
         
         // Ou recharger complètement si nécessaire
         if (window.location.pathname.includes('/profil')) {

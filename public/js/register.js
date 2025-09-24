@@ -87,7 +87,7 @@ function validateUsername() {
         updateSubmitButton();
     })
     .catch(error => {
-        console.error('Erreur validation username:', error);
+        logger.error('Erreur validation username:', error);
         showValidationFeedback(usernameInput, feedbackDiv, 'invalid', 'Erreur lors de la vérification');
         updateSubmitButton();
     });
@@ -130,7 +130,7 @@ function validateEmail() {
         updateSubmitButton();
     })
     .catch(error => {
-        console.error('Erreur validation email:', error);
+        logger.error('Erreur validation email:', error);
         showValidationFeedback(emailInput, feedbackDiv, 'invalid', 'Erreur lors de la vérification');
         updateSubmitButton();
     });
@@ -363,7 +363,7 @@ function handleFormSubmit() {
             }
         })
         .catch(error => {
-            console.error('Erreur lors de l\'enregistrement:', error);
+            logger.error('Erreur lors de l\'enregistrement:', error);
             showRegistrationMessage('Une erreur est survenue lors de la création du compte.', 'error');
             
             // Réactiver le bouton
