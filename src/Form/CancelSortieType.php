@@ -40,6 +40,8 @@ class CancelSortieType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            // Ne pas lier le formulaire à une entité spécifique
+            // car motifAnnulation n'est pas une propriété de Sortie
             'data_class' => null,
         ]);
     }

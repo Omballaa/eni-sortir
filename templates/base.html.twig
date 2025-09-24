@@ -18,6 +18,13 @@
         {% block javascripts %}
             {# Bootstrap JS via CDN #}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+            
+            {# Utils.js - Fonctions utilitaires pour toasts, modales et AJAX #}
+            <script src="{{ asset('js/utils.js') }}"></script>
+            
+            {# Modales spécialisées #}
+            <script src="{{ asset('js/profil.modal.js') }}"></script>
+            <script src="{{ asset('js/sortie.modal.js') }}"></script>
         {% endblock %}
     </head>
     <body>
@@ -62,8 +69,11 @@
                                     {% endif %}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ path('app_profil_show') }}">
+                                    <li><a class="dropdown-item" href="#" onclick="openProfilModal({{ app.user.id }})">
                                         <i class="bi bi-person"></i> Mon profil
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openProfilEditModal({{ app.user.id }})">
+                                        <i class="bi bi-pencil"></i> Modifier mon profil
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ path('app_logout') }}">

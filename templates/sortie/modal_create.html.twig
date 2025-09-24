@@ -1,0 +1,106 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bi bi-plus-circle"></i> Créer une nouvelle sortie
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+{{ form_start(form, {
+    'attr': {
+        'id': 'sortie-create-form',
+        'data-action': path('app_sortie_create_modal'),
+        'novalidate': 'novalidate'
+    }
+}) }}
+
+<div class="modal-body">
+    <!-- Informations principales -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informations de base</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    {{ form_row(form.nom) }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    {{ form_row(form.infosSortie) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planification -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-calendar-event"></i> Planification</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.dateHeureDebut) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.duree) }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.dateLimiteInscription) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.nbInscriptionsMax) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lieu -->
+    <div class="card mb-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Localisation</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.ville) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.lieu, {'attr': {'disabled': true}}) }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.latitude) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.longitude) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="form-result" class="mt-3"></div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        <i class="bi bi-arrow-left"></i> Retour
+    </button>
+    <div class="ms-auto">
+        <button type="submit" name="save" class="btn btn-primary me-2">
+            <i class="bi bi-floppy"></i> Enregistrer
+        </button>
+        <button type="submit" name="publish" class="btn btn-success">
+            <i class="bi bi-eye"></i> Enregistrer et publier
+        </button>
+    </div>
+</div>
+
+{{ form_end(form) }}

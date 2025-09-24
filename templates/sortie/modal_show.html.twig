@@ -1,0 +1,207 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bi bi-info-circle"></i> {{ sortie.nom }}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-calendar-event"></i> Informations de la sortie
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Date et heure :</strong></div>
+                        <div class="col-sm-8">
+                            <i class="bi bi-calendar"></i> {{ sortie.dateHeureDebut|date('d/m/Y à H:i') }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Durée :</strong></div>
+                        <div class="col-sm-8">
+                            <i class="bi bi-clock"></i> {{ sortie.duree }} minutes
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Date limite :</strong></div>
+                        <div class="col-sm-8">
+                            <i class="bi bi-calendar-x"></i> {{ sortie.dateLimiteInscription|date('d/m/Y à H:i') }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Participants :</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-info fs-6">{{ sortie.inscriptions|length }} / {{ sortie.nbInscriptionsMax }}</span>
+                            {% if sortie.inscriptions|length >= sortie.nbInscriptionsMax %}
+                                <span class="badge bg-danger ms-2">Complet</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if sortie.infosSortie %}
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Description :</strong></div>
+                            <div class="col-sm-8">{{ sortie.infosSortie|nl2br }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-geo-alt"></i> Lieu et organisateur
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Lieu :</strong></div>
+                        <div class="col-sm-8">
+                            <strong>{{ sortie.lieu.nomLieu }}</strong><br>
+                            <small class="text-muted">
+                                {{ sortie.lieu.rue }}<br>
+                                {{ sortie.lieu.ville.codePostal }} {{ sortie.lieu.ville.nomVille }}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Organisateur :</strong></div>
+                        <div class="col-sm-8">
+                            <a href="#" onclick="openProfilModal({{ sortie.organisateur.id }})" class="text-decoration-none">
+                                <i class="bi bi-person"></i> {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}
+                            </a>
+                            <br><small class="text-muted">{{ sortie.organisateur.pseudo }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-4"><strong>Site :</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-primary">{{ sortie.organisateur.site.nomSite }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    <h6 class="mb-0">État</h6>
+                </div>
+                <div class="card-body text-center">
+                    <span class="badge fs-6 bg-{{ 
+                        sortie.etat.libelle == 'Créée' ? 'secondary' :
+                        sortie.etat.libelle == 'Ouverte' ? 'success' :
+                        sortie.etat.libelle == 'Fermée' ? 'warning' :
+                        sortie.etat.libelle == 'Activité en cours' ? 'info' :
+                        sortie.etat.libelle == 'Passée' ? 'dark' :
+                        sortie.etat.libelle == 'Annulée' ? 'danger' :
+                        'secondary'
+                    }}">
+                        {{ sortie.etat.libelle }}
+                    </span>
+                </div>
+            </div>
+            
+            {% if sortie.inscriptions|length > 0 %}
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-people"></i> Participants ({{ sortie.inscriptions|length }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                            {% for inscription in sortie.inscriptions %}
+                                <div class="list-group-item p-2">
+                                    <a href="#" onclick="openProfilModal({{ inscription.participant.id }})" class="text-decoration-none">
+                                        <small>
+                                            <i class="bi bi-person"></i> {{ inscription.participant.prenom }} {{ inscription.participant.nom }}
+                                            <br><span class="text-muted">{{ inscription.participant.pseudo }}</span>
+                                        </small>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    {% set userInscrit = false %}
+    {% for inscription in sortie.inscriptions %}
+        {% if inscription.participant.id == app.user.id %}
+            {% set userInscrit = true %}
+        {% endif %}
+    {% endfor %}
+    
+    {# Bouton Retour à gauche - toujours présent #}
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        <i class="bi bi-arrow-left"></i> Retour
+    </button>
+    
+    {# Actions à droite seulement si l'utilisateur peut faire quelque chose #}
+    {% set canInteract = false %}
+    
+    {# L'utilisateur peut interagir s'il peut s'inscrire/se désinscrire OU s'il est organisateur #}
+    {% if sortie.etat.libelle == 'Ouverte' or sortie.organisateur.id == app.user.id %}
+        {% set canInteract = true %}
+    {% endif %}
+    
+    {# Container pour les actions à droite - même si vide pour maintenir le bouton Retour à gauche #}
+    <div class="ms-auto">
+        {% if canInteract %}
+            {# Actions d'inscription/désinscription pour TOUTES les sorties ouvertes (même créées par moi) #}
+            {% if sortie.etat.libelle == 'Ouverte' %}
+                {% if not userInscrit %}
+                    {% if sortie.inscriptions|length < sortie.nbInscriptionsMax %}
+                        <button type="button" class="btn btn-success me-2" onclick="inscriptionAction({{ sortie.id }}, 'inscrire')">
+                            <i class="bi bi-plus-circle"></i> S'inscrire
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-secondary me-2" disabled>
+                            <i class="bi bi-x-circle"></i> Complet
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <button type="button" class="btn btn-danger me-2" onclick="inscriptionAction({{ sortie.id }}, 'desinscrire')">
+                        <i class="bi bi-dash-circle"></i> Se désinscrire
+                    </button>
+                {% endif %}
+            {% endif %}
+            
+            {# Actions pour l'organisateur - UNIQUEMENT sur les sorties NON ouvertes #}
+            {% if sortie.organisateur.id == app.user.id %}
+                {% if sortie.etat.libelle in ['Créée'] %}
+                    {# Sortie créée par moi : seulement Modifier (pas Publier ici) #}
+                    <button type="button" class="btn btn-primary" onclick="openSortieEditModal({{ sortie.id }})">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </button>
+                {% elseif sortie.etat.libelle in ['Fermée'] %}
+                    {# Sortie fermée : seulement Annuler #}
+                    <button type="button" class="btn btn-danger" onclick="openSortieCancelModal({{ sortie.id }})">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                {% elseif sortie.etat.libelle in ['Ouverte'] %}
+                    {# Sortie ouverte : seulement Annuler (pas de modification possible) #}
+                    <button type="button" class="btn btn-danger" onclick="openSortieCancelModal({{ sortie.id }})">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

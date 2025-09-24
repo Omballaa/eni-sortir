@@ -1,0 +1,143 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bi bi-person-circle"></i> Profil de {{ user.prenom }} {{ user.nom }}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-circle display-1 text-primary"></i>
+                    <h5 class="card-title mt-2">{{ user.prenom }} {{ user.nom }}</h5>
+                    <p class="text-muted">{{ user.pseudo }}</p>
+                    {% if user.telephone %}
+                        <p><i class="bi bi-telephone"></i> {{ user.telephone }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> Informations personnelles
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email :</strong></div>
+                        <div class="col-sm-8">{{ user.mail }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Site :</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-primary">{{ user.site.nomSite }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if user.telephone %}
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Téléphone :</strong></div>
+                            <div class="col-sm-8">{{ user.telephone }}</div>
+                        </div>
+                    {% endif %}
+                    
+
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Statut :</strong></div>
+                        <div class="col-sm-8">
+                            {% if user.actif %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Actif
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Inactif
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-activity"></i> Statistiques
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ sortiesOrganisees|length }}</h4>
+                                <small class="text-muted">Sorties organisées</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ participations|length }}</h4>
+                                <small class="text-muted">Participations</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if sortiesOrganisees|length > 0 %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-calendar-plus"></i> Dernières sorties organisées
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>État</th>
+                                <th>Participants</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sortie in sortiesOrganisees|slice(0, 5) %}
+                                <tr>
+                                    <td>
+                                        <a href="#" onclick="openSortieModal({{ sortie.id }})" class="text-decoration-none">
+                                            {{ sortie.nom }}
+                                        </a>
+                                    </td>
+                                    <td>{{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ sortie.etat.libelle == 'Ouverte' ? 'success' : (sortie.etat.libelle == 'Fermée' ? 'warning' : 'secondary') }}">
+                                            {{ sortie.etat.libelle }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ sortie.inscriptions|length }}/{{ sortie.nbInscriptionsMax }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="modal-footer">
+    {% if is_granted('ROLE_USER') and app.user.id == user.id %}
+        <button type="button" class="btn btn-primary" onclick="openProfilEditModal({{ user.id }})">
+            <i class="bi bi-pencil"></i> Modifier mon profil
+        </button>
+    {% endif %}
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="bi bi-x-circle"></i> Fermer
+    </button>
+</div>

@@ -126,15 +126,15 @@
     </div>
 
     {# Tableau des sorties #}
-    <div class="card">
+    <div class="card" id="sorties-list">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">
                 <i class="bi bi-calendar-event"></i> Liste des sorties 
                 <span class="badge bg-primary">{{ sorties|length }}</span>
             </h5>
-            <a href="{{ path('app_sortie_create') }}" class="btn btn-success btn-sm">
+            <button type="button" onclick="openSortieCreateModal()" class="btn btn-success btn-sm">
                 <i class="bi bi-plus-circle"></i> Créer une sortie
-            </a>
+            </button>
         </div>
         <div class="card-body p-0">
             {% if sorties|length > 0 %}
@@ -195,6 +195,8 @@
                                             {% set etatClass = 'info' %}
                                         {% elseif sortie.etat.libelle == 'Fermée' %}
                                             {% set etatClass = 'danger' %}
+                                        {% elseif sortie.etat.libelle == 'Annulée' %}
+                                            {% set etatClass = 'danger' %}
                                         {% endif %}
                                         <span class="badge bg-{{ etatClass }}">{{ sortie.etat.libelle }}</span>
                                     </td>
@@ -206,38 +208,34 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ path('app_profil_show', {id: sortie.organisateur.id}) }}" 
-                                           class="text-primary text-decoration-none" 
-                                           title="Voir le profil de {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}">
+                                        <button type="button" 
+                                                onclick="openProfilModal({{ sortie.organisateur.id }})" 
+                                                class="btn btn-link text-primary text-decoration-none p-0" 
+                                                title="Voir le profil de {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}">
                                             {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.
-                                        </a>
+                                        </button>
                                         {% if sortie.organisateur.id == user.id %}
                                             <br><small class="badge bg-warning text-dark">Moi</small>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ path('app_sortie_show', {id: sortie.id}) }}" class="btn btn-outline-primary" title="Afficher">
+                                            <button type="button" onclick="openSortieModal({{ sortie.id }})" class="btn btn-outline-primary" title="Afficher">
                                                 <i class="bi bi-eye"></i>
-                                            </a>
-                                            {% if sortie.organisateur.id == user.id %}
-                                                <a href="{{ path('app_sortie_edit', {id: sortie.id}) }}" class="btn btn-outline-warning" title="Modifier">
+                                            </button>
+                                            {% if sortie.organisateur.id == user.id and sortie.etat.libelle not in ['Ouverte', 'Annulée'] %}
+                                                <button type="button" onclick="openSortieEditModal({{ sortie.id }})" class="btn btn-outline-warning" title="Modifier">
                                                     <i class="bi bi-pencil"></i>
-                                                </a>
+                                                </button>
                                             {% endif %}
                                             {% if not isInscrit and sortie.etat.libelle == 'Ouverte' and nbInscrits < sortie.nbInscriptionsMax %}
-                                                <form method="post" action="{{ path('app_inscription_create', {id: sortie.id}) }}" class="d-inline">
-                                                    <button type="submit" class="btn btn-outline-success btn-sm" title="S'inscrire">
-                                                        <i class="bi bi-person-plus"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'inscrire')" class="btn btn-outline-success btn-sm" title="S'inscrire">
+                                                    <i class="bi bi-person-plus"></i>
+                                                </button>
                                             {% elseif isInscrit and sortie.etat.libelle == 'Ouverte' %}
-                                                <form method="post" action="{{ path('app_inscription_delete', {id: sortie.id}) }}" class="d-inline">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Se désister"
-                                                            onclick="return confirm('Êtes-vous sûr de vouloir vous désister ?')">
-                                                        <i class="bi bi-person-dash"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'desinscrire')" class="btn btn-outline-danger btn-sm" title="Se désister">
+                                                    <i class="bi bi-person-dash"></i>
+                                                </button>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -251,9 +249,9 @@
                     <i class="bi bi-calendar-x display-1 text-muted"></i>
                     <h4 class="text-muted mt-3">Aucune sortie trouvée</h4>
                     <p class="text-muted">Modifiez vos critères de recherche ou créez une nouvelle sortie.</p>
-                    <a href="{{ path('app_sortie_create') }}" class="btn btn-primary">
+                    <button type="button" onclick="openSortieCreateModal()" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Créer une sortie
-                    </a>
+                    </button>
                 </div>
             {% endif %}
         </div>
