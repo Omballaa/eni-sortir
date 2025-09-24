@@ -32,3 +32,8 @@ Thumbs.db
 
 # Locals
 .env*
+
+###> Uploads utilisateur ###
+# Fichiers uploadés par les utilisateurs (photos de profil, etc.)
+/public/uploads/
+###< Uploads utilisateur ###
