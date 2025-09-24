@@ -1,0 +1,118 @@
+{# Template partiel pour la liste des sorties - utilisé pour le refresh AJAX #}
+{% if sorties|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom de la sortie</th>
+                    <th>Date de la sortie</th>
+                    <th>Clôture</th>
+                    <th>Inscrits/places</th>
+                    <th>État</th>
+                    <th>Inscrit</th>
+                    <th>Organisateur</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sortie in sorties %}
+                    {% set isInscrit = false %}
+                    {% set nbInscrits = sortie.inscriptions|length %}
+                    {% for inscription in sortie.inscriptions %}
+                        {% if inscription.participant.id == user.id %}
+                            {% set isInscrit = true %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <tr>
+                        <td>
+                            <strong>{{ sortie.nom }}</strong>
+                            {% if sortie.infosSortie %}
+                                <br><small class="text-muted">{{ sortie.infosSortie|slice(0, 50) }}{% if sortie.infosSortie|length > 50 %}...{% endif %}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar3"></i> 
+                            {{ sortie.dateHeureDebut|date('d/m/Y H\\hi') }}
+                            {% if sortie.duree %}
+                                <br><small class="text-muted">Durée: {{ sortie.duree }}min</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="bi bi-clock"></i> 
+                            {{ sortie.dateLimiteInscription|date('d/m/Y') }}
+                        </td>
+                        <td>
+                            <span class="badge {% if nbInscrits >= sortie.nbInscriptionsMax %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ nbInscrits }}/{{ sortie.nbInscriptionsMax }}
+                            </span>
+                        </td>
+                        <td>
+                            {% set etatClass = 'secondary' %}
+                            {% if sortie.etat.libelle == 'Ouverte' %}
+                                {% set etatClass = 'success' %}
+                            {% elseif sortie.etat.libelle == 'Clôturée' %}
+                                {% set etatClass = 'warning' %}
+                            {% elseif sortie.etat.libelle == 'En cours' %}
+                                {% set etatClass = 'info' %}
+                            {% elseif sortie.etat.libelle == 'Fermée' %}
+                                {% set etatClass = 'danger' %}
+                            {% elseif sortie.etat.libelle == 'Annulée' %}
+                                {% set etatClass = 'danger' %}
+                            {% endif %}
+                            <span class="badge bg-{{ etatClass }}">{{ sortie.etat.libelle }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if isInscrit %}
+                                <i class="bi bi-check-circle-fill text-success" title="Inscrit"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted" title="Non inscrit"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" 
+                                    onclick="openProfilModal({{ sortie.organisateur.id }})" 
+                                    class="btn btn-link text-primary text-decoration-none p-0" 
+                                    title="Voir le profil de {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}">
+                                {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.
+                            </button>
+                            {% if sortie.organisateur.id == user.id %}
+                                <br><small class="badge bg-warning text-dark">Moi</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" onclick="openSortieModal({{ sortie.id }})" class="btn btn-outline-primary" title="Afficher">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                {% if sortie.organisateur.id == user.id and sortie.etat.libelle not in ['Ouverte', 'Annulée'] %}
+                                    <button type="button" onclick="openSortieEditModal({{ sortie.id }})" class="btn btn-outline-warning" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                {% endif %}
+                                {% if not isInscrit and sortie.etat.libelle == 'Ouverte' and nbInscrits < sortie.nbInscriptionsMax %}
+                                    <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'inscrire')" class="btn btn-outline-success btn-sm" title="S'inscrire">
+                                        <i class="bi bi-person-plus"></i>
+                                    </button>
+                                {% elseif isInscrit and sortie.etat.libelle == 'Ouverte' %}
+                                    <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'desinscrire')" class="btn btn-outline-danger btn-sm" title="Se désister">
+                                        <i class="bi bi-person-dash"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <h4 class="text-muted mt-3">Aucune sortie trouvée</h4>
+        <p class="text-muted">Modifiez vos critères de recherche ou créez une nouvelle sortie.</p>
+        <button type="button" onclick="openSortieCreateModal()" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Créer une sortie
+        </button>
+    </div>
+{% endif %}

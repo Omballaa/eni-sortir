@@ -78,7 +78,7 @@
                     {# Bouton rechercher aligné #}
                     <div class="col-md-2">
                         <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary w-100 d-block">
+                        <button type="button" onclick="refreshSortiesList()" class="btn btn-primary w-100 d-block">
                             <i class="bi bi-search"></i> Rechercher
                         </button>
                     </div>
@@ -136,124 +136,86 @@
                 <i class="bi bi-plus-circle"></i> Créer une sortie
             </button>
         </div>
-        <div class="card-body p-0">
-            {% if sorties|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nom de la sortie</th>
-                                <th>Date de la sortie</th>
-                                <th>Clôture</th>
-                                <th>Inscrits/places</th>
-                                <th>État</th>
-                                <th>Inscrit</th>
-                                <th>Organisateur</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sortie in sorties %}
-                                {% set isInscrit = false %}
-                                {% set nbInscrits = sortie.inscriptions|length %}
-                                {% for inscription in sortie.inscriptions %}
-                                    {% if inscription.participant.id == user.id %}
-                                        {% set isInscrit = true %}
-                                    {% endif %}
-                                {% endfor %}
-                                
-                                <tr>
-                                    <td>
-                                        <strong>{{ sortie.nom }}</strong>
-                                        {% if sortie.infosSortie %}
-                                            <br><small class="text-muted">{{ sortie.infosSortie|slice(0, 50) }}{% if sortie.infosSortie|length > 50 %}...{% endif %}</small>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-calendar3"></i> 
-                                        {{ sortie.dateHeureDebut|date('d/m/Y H\\hi') }}
-                                        {% if sortie.duree %}
-                                            <br><small class="text-muted">Durée: {{ sortie.duree }}min</small>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <i class="bi bi-clock"></i> 
-                                        {{ sortie.dateLimiteInscription|date('d/m/Y') }}
-                                    </td>
-                                    <td>
-                                        <span class="badge {% if nbInscrits >= sortie.nbInscriptionsMax %}bg-danger{% else %}bg-success{% endif %}">
-                                            {{ nbInscrits }}/{{ sortie.nbInscriptionsMax }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% set etatClass = 'secondary' %}
-                                        {% if sortie.etat.libelle == 'Ouverte' %}
-                                            {% set etatClass = 'success' %}
-                                        {% elseif sortie.etat.libelle == 'Clôturée' %}
-                                            {% set etatClass = 'warning' %}
-                                        {% elseif sortie.etat.libelle == 'En cours' %}
-                                            {% set etatClass = 'info' %}
-                                        {% elseif sortie.etat.libelle == 'Fermée' %}
-                                            {% set etatClass = 'danger' %}
-                                        {% elseif sortie.etat.libelle == 'Annulée' %}
-                                            {% set etatClass = 'danger' %}
-                                        {% endif %}
-                                        <span class="badge bg-{{ etatClass }}">{{ sortie.etat.libelle }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        {% if isInscrit %}
-                                            <i class="bi bi-check-circle-fill text-success" title="Inscrit"></i>
-                                        {% else %}
-                                            <i class="bi bi-x-circle text-muted" title="Non inscrit"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <button type="button" 
-                                                onclick="openProfilModal({{ sortie.organisateur.id }})" 
-                                                class="btn btn-link text-primary text-decoration-none p-0" 
-                                                title="Voir le profil de {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom }}">
-                                            {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|slice(0,1) }}.
-                                        </button>
-                                        {% if sortie.organisateur.id == user.id %}
-                                            <br><small class="badge bg-warning text-dark">Moi</small>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <button type="button" onclick="openSortieModal({{ sortie.id }})" class="btn btn-outline-primary" title="Afficher">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            {% if sortie.organisateur.id == user.id and sortie.etat.libelle not in ['Ouverte', 'Annulée'] %}
-                                                <button type="button" onclick="openSortieEditModal({{ sortie.id }})" class="btn btn-outline-warning" title="Modifier">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                            {% endif %}
-                                            {% if not isInscrit and sortie.etat.libelle == 'Ouverte' and nbInscrits < sortie.nbInscriptionsMax %}
-                                                <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'inscrire')" class="btn btn-outline-success btn-sm" title="S'inscrire">
-                                                    <i class="bi bi-person-plus"></i>
-                                                </button>
-                                            {% elseif isInscrit and sortie.etat.libelle == 'Ouverte' %}
-                                                <button type="button" onclick="inscriptionAction({{ sortie.id }}, 'desinscrire')" class="btn btn-outline-danger btn-sm" title="Se désister">
-                                                    <i class="bi bi-person-dash"></i>
-                                                </button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="bi bi-calendar-x display-1 text-muted"></i>
-                    <h4 class="text-muted mt-3">Aucune sortie trouvée</h4>
-                    <p class="text-muted">Modifiez vos critères de recherche ou créez une nouvelle sortie.</p>
-                    <button type="button" onclick="openSortieCreateModal()" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> Créer une sortie
-                    </button>
-                </div>
-            {% endif %}
+        <div class="card-body p-0" id="sorties-container">
+            {{ include('home/_sorties_list.html.twig', {'sorties': sorties, 'user': user}) }}
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-refresh optionnel sur changement de certains filtres
+            const siteSelect = document.getElementById('site');
+            if (siteSelect) {
+                siteSelect.addEventListener('change', function() {
+                    // Attendre un petit délai pour éviter trop de requêtes
+                    setTimeout(() => {
+                        refreshSortiesList();
+                    }, 300);
+                });
+            }
+
+            // Recherche en temps réel sur le nom (avec debounce)
+            const nomInput = document.getElementById('nom');
+            let searchTimeout;
+            if (nomInput) {
+                nomInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        refreshSortiesList();
+                    }, 800); // Attendre 800ms après la dernière frappe
+                });
+            }
+
+            // Auto-refresh sur changement des dates (avec debounce)
+            let dateTimeout;
+            const dateDebut = document.getElementById('dateDebut');
+            const dateFin = document.getElementById('dateFin');
+            
+            if (dateDebut) {
+                dateDebut.addEventListener('change', function() {
+                    clearTimeout(dateTimeout);
+                    dateTimeout = setTimeout(() => {
+                        refreshSortiesList();
+                    }, 500);
+                });
+            }
+            
+            if (dateFin) {
+                dateFin.addEventListener('change', function() {
+                    clearTimeout(dateTimeout);
+                    dateTimeout = setTimeout(() => {
+                        refreshSortiesList();
+                    }, 500);
+                });
+            }
+
+            // Auto-refresh sur changement des checkboxes
+            const checkboxes = [
+                'organisateurSeulement',
+                'inscritSeulement', 
+                'nonInscritSeulement',
+                'sortiesPassees'
+            ];
+
+            checkboxes.forEach(checkboxId => {
+                const checkbox = document.getElementById(checkboxId);
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        // Refresh immédiat pour les checkboxes
+                        refreshSortiesList();
+                    });
+                }
+            });
+
+            // Support de la touche Entrée sur tous les champs
+            document.querySelectorAll('#site, #nom, #dateDebut, #dateFin').forEach(field => {
+                field.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        refreshSortiesList();
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

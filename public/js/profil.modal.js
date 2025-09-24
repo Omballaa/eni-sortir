@@ -311,8 +311,8 @@ class ProfilModal {
      * Rafraîchit les données du profil affichées
      */
     refreshProfilData() {
-        // Rafraîchir les éléments du profil dans la page
-        refreshAjax('#user-info');
+        // Cette méthode n'est plus utilisée avec le système de modales
+        console.log('refreshProfilData: méthode dépréciée pour les modales');
         
         // Ou recharger complètement si nécessaire
         if (window.location.pathname.includes('/profil')) {

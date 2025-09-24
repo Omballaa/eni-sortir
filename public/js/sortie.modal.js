@@ -807,6 +807,13 @@ class SortieModal {
                 showToast(data.message, 'success');
                 // Rafraîchir le contenu de la modale
                 this.refreshModalContent();
+                
+                // Rafraîchir la liste des sorties si on est sur le dashboard
+                if (document.getElementById('sorties-container')) {
+                    setTimeout(() => {
+                        refreshSortiesList();
+                    }, 300);
+                }
             } else {
                 showToast(data.message, 'error');
             }
@@ -837,6 +844,13 @@ class SortieModal {
             if (data.success) {
                 showToast('Sortie publiée avec succès !', 'success');
                 this.refreshModalContent();
+                
+                // Rafraîchir la liste des sorties si on est sur le dashboard
+                if (document.getElementById('sorties-container')) {
+                    setTimeout(() => {
+                        refreshSortiesList();
+                    }, 300);
+                }
             } else {
                 showToast(data.message, 'error');
             }
@@ -851,12 +865,8 @@ class SortieModal {
      * Rafraîchit le contenu de la modale ouverte
      */
     refreshModalContent() {
-        if (this.currentModal) {
-            const modalBody = this.currentModal._element.querySelector('.modal-body');
-            if (modalBody) {
-                refreshAjax(modalBody);
-            }
-        }
+        // Cette méthode n'est plus utilisée - nous utilisons refreshSortiesList() maintenant
+        console.log('refreshModalContent: méthode dépréciée, utilisez refreshSortiesList()');
     }
 
     /**
@@ -875,9 +885,11 @@ class SortieModal {
                     bootstrapModal.hide();
                 }
             }
-            // Rafraîchir la liste des sorties
-            refreshAjax('#sorties-list');
-        }, 2000);
+            // Rafraîchir la liste des sorties si on est sur le dashboard
+            if (document.getElementById('sorties-container')) {
+                refreshSortiesList();
+            }
+        }, 1000); // Réduit le délai à 1 seconde
     }
 
     // Méthodes utilitaires partagées

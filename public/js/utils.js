@@ -273,6 +273,13 @@ function submitModalForm(form) {
             // Afficher une notification de succès
             showToast(data.message, 'success');
             
+            // Rafraîchir la liste des sorties si on est sur le dashboard
+            if (document.getElementById('sorties-container')) {
+                setTimeout(() => {
+                    refreshSortiesList();
+                }, 500);
+            }
+            
             // Rediriger si nécessaire
             if (data.redirect) {
                 setTimeout(() => {
@@ -344,3 +351,133 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+/**
+ * Rafraîchit la liste des sorties du dashboard
+ */
+function refreshSortiesList() {
+    console.log('🔄 Début refreshSortiesList');
+    const container = document.getElementById('sorties-container');
+    if (!container) {
+        console.warn('Container sorties-container not found');
+        return;
+    }
+    console.log('✅ Container trouvé:', container);
+
+    // Récupérer les filtres actuels du formulaire
+    const form = document.querySelector('form[method="get"]') || document.querySelector('form');
+    const params = new URLSearchParams();
+    
+    if (form) {
+        // Récupérer les champs classiques (input, select)
+        const formData = new FormData(form);
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
+            }
+        }
+        
+        // Traitement spécial pour les checkboxes (récupérer même celles non cochées)
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                params.set(checkbox.name, checkbox.value || '1');
+            }
+        });
+        
+        console.log('Paramètres de recherche:', params.toString());
+    } else {
+        console.warn('Formulaire de filtres non trouvé');
+    }
+
+    // Ajouter un indicateur de chargement
+    container.style.opacity = '0.6';
+    container.style.pointerEvents = 'none';
+    
+    const fullUrl = `/dashboard/refresh?${params.toString()}`;
+    console.log('🌐 URL de requête:', fullUrl);
+    
+    // Effectuer la requête AJAX
+    fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+            'Accept': 'text/html',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Remplacer le contenu
+        container.innerHTML = html;
+        
+        // Animation d'entrée
+        container.style.opacity = '0';
+        container.style.pointerEvents = 'auto';
+        
+        // Fade in
+        setTimeout(() => {
+            container.style.transition = 'opacity 0.3s ease-in-out';
+            container.style.opacity = '1';
+            
+            // Mettre à jour le badge de comptage après l'animation
+            updateSortiesCount();
+        }, 50);
+        
+        // Pas de message toast pour éviter le spam lors des actions multiples
+        console.log('✅ Liste des sorties mise à jour');
+    })
+    .catch(error => {
+        console.error('Erreur lors du refresh des sorties:', error);
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+        showToast('Erreur lors de la mise à jour de la liste', 'error');
+    });
+}
+
+/**
+ * Rafraîchit automatiquement après une action sur une sortie
+ * @param {string} message - Message de succès à afficher
+ */
+function refreshAfterSortieAction(message = 'Action effectuée avec succès') {
+    setTimeout(() => {
+        refreshSortiesList();
+        if (message) {
+            showToast(message, 'success');
+        }
+    }, 500); // Petit délai pour laisser le temps à l'action de se terminer
+}
+
+/**
+ * Met à jour le badge de comptage des sorties dans la navigation
+ */
+function updateSortiesCount() {
+    const container = document.querySelector('#sorties-container');
+    if (!container) return;
+    
+    // Compter le nombre de lignes de sorties
+    const sortieRows = container.querySelectorAll('tbody tr');
+    const count = sortieRows.length;
+    
+    // Trouver le badge dans le header du tableau des sorties
+    const badge = document.querySelector('#sorties-list .card-header .badge');
+    
+    if (badge && badge.textContent != count) {
+        // Animation fluide pour éviter le clignotement
+        badge.style.transition = 'all 0.2s ease-in-out';
+        badge.style.transform = 'scale(0.9)';
+        badge.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            badge.textContent = count;
+            badge.style.transform = 'scale(1)';
+            badge.style.opacity = '1';
+        }, 100);
+        
+        console.log(`✅ Badge mis à jour: ${count} sorties`);
+    }
+}
