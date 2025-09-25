@@ -96,17 +96,19 @@
                             </label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="inscritSeulement" 
-                                   id="inscritSeulement" value="1" 
-                                   {% if filtres.inscritSeulement %}checked{% endif %}>
+                            <input class="form-check-input" type="radio" name="inscriptionFilter" id="toutesSorties" value="toutes" {% if filtres.inscriptionFilter == 'toutes' or not filtres.inscriptionFilter %}checked{% endif %}>
+                            <label class="form-check-label" for="toutesSorties">
+                                Toutes les sorties
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="inscriptionFilter" id="inscritSeulement" value="inscritSeulement" {% if filtres.inscriptionFilter == 'inscritSeulement' %}checked{% endif %}>
                             <label class="form-check-label" for="inscritSeulement">
                                 Sorties auxquelles je suis inscrit/e
                             </label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="nonInscritSeulement" 
-                                   id="nonInscritSeulement" value="1" 
-                                   {% if filtres.nonInscritSeulement %}checked{% endif %}>
+                            <input class="form-check-input" type="radio" name="inscriptionFilter" id="nonInscritSeulement" value="nonInscritSeulement" {% if filtres.inscriptionFilter == 'nonInscritSeulement' %}checked{% endif %}>
                             <label class="form-check-label" for="nonInscritSeulement">
                                 Sorties auxquelles je ne suis pas inscrit/e
                             </label>
@@ -192,8 +194,6 @@
             // Auto-refresh sur changement des checkboxes
             const checkboxes = [
                 'organisateurSeulement',
-                'inscritSeulement', 
-                'nonInscritSeulement',
                 'sortiesPassees'
             ];
 
@@ -202,6 +202,23 @@
                 if (checkbox) {
                     checkbox.addEventListener('change', function() {
                         // Refresh immédiat pour les checkboxes
+                        refreshSortiesList();
+                    });
+                }
+            });
+
+            // Auto-refresh sur changement des radiogroups
+            const radiobuttons = [
+                'toutesSorties',
+                'inscritSeulement',
+                'nonInscritSeulement'
+
+            ];
+
+            radiobuttons.forEach(radiobuttonId => {
+                const radiobutton = document.getElementById(radiobuttonId);
+                if (radiobutton) {
+                    radiobutton.addEventListener('change', function() {
                         refreshSortiesList();
                     });
                 }

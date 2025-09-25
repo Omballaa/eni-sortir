@@ -32,8 +32,9 @@ class HomeController extends AbstractController
         $dateDebut = $request->query->get('dateDebut');
         $dateFin = $request->query->get('dateFin');
         $organisateurSeulement = $request->query->get('organisateurSeulement');
-        $inscritSeulement = $request->query->get('inscritSeulement');
-        $nonInscritSeulement = $request->query->get('nonInscritSeulement');
+        //$inscritSeulement = $request->query->get('inscritSeulement');
+        //$nonInscritSeulement = $request->query->get('nonInscritSeulement');
+        $inscriptionFilter = $request->query->get('inscriptionFilter');
         $sortiesPassees = $request->query->get('sortiesPassees');
 
         // Construction des critères de recherche
@@ -60,7 +61,7 @@ class HomeController extends AbstractController
             $sorties = array_filter($sorties, fn($sortie) => $sortie->getOrganisateur()->getId() === $user->getId());
         }
 
-        if ($inscritSeulement) {
+        if ($inscriptionFilter === 'inscritSeulement') {
             $sorties = array_filter($sorties, function($sortie) use ($user) {
                 foreach ($sortie->getInscriptions() as $inscription) {
                     if ($inscription->getParticipant()->getId() === $user->getId()) {
@@ -71,7 +72,7 @@ class HomeController extends AbstractController
             });
         }
 
-        if ($nonInscritSeulement) {
+        if ($inscriptionFilter === 'nonInscritSeulement') {
             $sorties = array_filter($sorties, function($sortie) use ($user) {
                 foreach ($sortie->getInscriptions() as $inscription) {
                     if ($inscription->getParticipant()->getId() === $user->getId()) {
@@ -102,8 +103,9 @@ class HomeController extends AbstractController
                 'dateDebut' => $dateDebut,
                 'dateFin' => $dateFin,
                 'organisateurSeulement' => $organisateurSeulement,
-                'inscritSeulement' => $inscritSeulement,
-                'nonInscritSeulement' => $nonInscritSeulement,
+                //'inscritSeulement' => $inscritSeulement,
+                //'nonInscritSeulement' => $nonInscritSeulement,
+                'inscriptionFilter' => $inscriptionFilter,
                 'sortiesPassees' => $sortiesPassees,
             ]
         ]);
@@ -123,9 +125,11 @@ class HomeController extends AbstractController
         $dateDebut = $request->query->get('dateDebut');
         $dateFin = $request->query->get('dateFin');
         $organisateurSeulement = $request->query->get('organisateurSeulement');
-        $inscritSeulement = $request->query->get('inscritSeulement');
-        $nonInscritSeulement = $request->query->get('nonInscritSeulement');
+        //$inscritSeulement = $request->query->get('inscritSeulement');
+        //$nonInscritSeulement = $request->query->get('nonInscritSeulement');
+        $inscriptionFilter = $request->query->get('inscriptionFilter');
         $sortiesPassees = $request->query->get('sortiesPassees');
+
 
         // Construction des critères de recherche
         if ($site) {
@@ -151,7 +155,7 @@ class HomeController extends AbstractController
             $sorties = array_filter($sorties, fn($sortie) => $sortie->getOrganisateur()->getId() === $user->getId());
         }
 
-        if ($inscritSeulement) {
+        if ($inscriptionFilter === 'inscritSeulement') {
             $sorties = array_filter($sorties, function($sortie) use ($user) {
                 foreach ($sortie->getInscriptions() as $inscription) {
                     if ($inscription->getParticipant()->getId() === $user->getId()) {
@@ -162,7 +166,7 @@ class HomeController extends AbstractController
             });
         }
 
-        if ($nonInscritSeulement) {
+        if ($inscriptionFilter === 'nonInscritSeulement') {
             $sorties = array_filter($sorties, function($sortie) use ($user) {
                 foreach ($sortie->getInscriptions() as $inscription) {
                     if ($inscription->getParticipant()->getId() === $user->getId()) {
