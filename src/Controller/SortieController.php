@@ -9,6 +9,7 @@ use App\Form\SortieType;
 use App\Form\CancelSortieType;
 use App\Repository\EtatRepository;
 use App\Repository\SortieRepository;
+use App\Service\MessagerieSortieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -144,7 +145,7 @@ class SortieController extends AbstractController
     }
 
     #[Route('/{id}/annuler', name: 'app_sortie_cancel', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function cancel(Request $request, Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository): Response
+    public function cancel(Request $request, Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository, MessagerieSortieService $messagerie): Response
     {
         /** @var Participant $user */
         $user = $this->getUser();
@@ -178,6 +179,9 @@ class SortieController extends AbstractController
                 $sortie->setInfosSortie($infosActuelles . $motifAnnulation);
                 
                 $entityManager->flush();
+
+                // Gérer l'annulation dans le système de messagerie
+                $messagerie->gererAnnulationSortie($sortie, $data['motifAnnulation']);
                 
                 // Retourner JSON pour les appels AJAX
                 if ($request->isXmlHttpRequest()) {
@@ -249,7 +253,7 @@ class SortieController extends AbstractController
     // ===== ROUTES POUR LES MODALES =====
 
     #[Route('/nouvelle/modal', name: 'app_sortie_create_modal', methods: ['GET', 'POST'])]
-    public function createModal(Request $request, EtatRepository $etatRepository, EntityManagerInterface $entityManager): Response
+    public function createModal(Request $request, EtatRepository $etatRepository, EntityManagerInterface $entityManager, MessagerieSortieService $messagerie): Response
     {
         error_log("SortieController::createModal - Method: " . $request->getMethod());
         
@@ -287,6 +291,14 @@ class SortieController extends AbstractController
             $entityManager->persist($sortie);
             $entityManager->flush();
             error_log("SortieController::createModal - Sortie créée avec ID: " . $sortie->getId());
+
+            // Créer automatiquement le groupe de discussion
+            $messagerie->creerGroupePourSortie($sortie);
+            
+            // Si la sortie est publiée, envoyer le message système
+            if ($action === 'publish') {
+                $messagerie->gererPublicationSortie($sortie);
+            }
 
             $message = $action === 'publish' ? 'La sortie a été créée et publiée avec succès !' : 'La sortie a été créée avec succès !';
 
@@ -388,7 +400,7 @@ class SortieController extends AbstractController
             
             if ($action === 'publish') {
                 // Publier la sortie (changer l'état à "Ouverte")
-                $etatOuverte = $entityManager->getRepository(\App\Entity\Etat::class)->findOneBy(['libelle' => 'Ouverte']);
+                $etatOuverte = $entityManager->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']);
                 if ($etatOuverte) {
                     $sortie->setEtat($etatOuverte);
                     error_log("SortieController::editModal - État changé à Ouverte");
@@ -453,7 +465,7 @@ class SortieController extends AbstractController
     }
 
     #[Route('/{id}/inscrire', name: 'app_sortie_inscrire', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function inscrire(Sortie $sortie, EntityManagerInterface $entityManager): Response
+    public function inscrire(Sortie $sortie, EntityManagerInterface $entityManager, MessagerieSortieService $messagerie): Response
     {
         /** @var Participant $user */
         $user = $this->getUser();
@@ -482,12 +494,15 @@ class SortieController extends AbstractController
         
         $entityManager->persist($inscription);
         $entityManager->flush();
+
+        // Ajouter le participant au groupe de discussion
+        $messagerie->ajouterParticipantAuGroupe($sortie, $user);
         
         return $this->json(['success' => true, 'message' => 'Inscription réussie !']);
     }
 
     #[Route('/{id}/desinscrire', name: 'app_sortie_desinscrire', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function desinscrire(Sortie $sortie, EntityManagerInterface $entityManager): Response
+    public function desinscrire(Sortie $sortie, EntityManagerInterface $entityManager, MessagerieSortieService $messagerie): Response
     {
         /** @var Participant $user */
         $user = $this->getUser();
@@ -507,12 +522,15 @@ class SortieController extends AbstractController
         
         $entityManager->remove($inscriptionToRemove);
         $entityManager->flush();
+
+        // Retirer le participant du groupe de discussion
+        $messagerie->retirerParticipantDuGroupe($sortie, $user);
         
         return $this->json(['success' => true, 'message' => 'Désinscription réussie !']);
     }
 
     #[Route('/{id}/publier', name: 'app_sortie_publier', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function publier(Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository): Response
+    public function publier(Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository, MessagerieSortieService $messagerie): Response
     {
         /** @var Participant $user */
         $user = $this->getUser();
@@ -531,6 +549,9 @@ class SortieController extends AbstractController
         if ($etatOuverte) {
             $sortie->setEtat($etatOuverte);
             $entityManager->flush();
+
+            // Gérer la publication dans le système de messagerie
+            $messagerie->gererPublicationSortie($sortie);
             
             return $this->json(['success' => true, 'message' => 'Sortie publiée avec succès !']);
         }

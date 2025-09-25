@@ -25,6 +25,8 @@
             {# Modales spécialisées #}
             <script src="{{ asset('js/profil.modal.js') }}"></script>
             <script src="{{ asset('js/sortie.modal.js') }}"></script>
+            
+
         {% endblock %}
     </head>
     <body>
@@ -50,6 +52,7 @@
                                     <i class="bi bi-calendar-plus"></i> Sorties
                                 </a>
                             </li>
+
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('app_admin_dashboard') }}">
@@ -97,6 +100,9 @@
         <main class="container mt-4">
             {% block body %}{% endblock %}
         </main>
+
+        {# Popup de messagerie globale #}
+        {% include 'includes/messenger_popup.html.twig' %}
 
         {# Footer Bootstrap #}
         <footer class="bg-light mt-5 py-4">
