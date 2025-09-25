@@ -61,7 +61,7 @@ class MessageController extends AbstractController
                     'id' => $message->getId(),
                     'contenu' => $message->getContenu(),
                     'auteur' => $message->getExpediteur()->getPseudo(),
-                    'dateEnvoi' => $message->getDateEnvoi()->format('d/m/Y H:i'),
+                    'dateEnvoi' => $this->formatDateForTimezone($message->getDateEnvoi()),
                     'estSysteme' => $message->isEstSysteme()
                 ]
             ]);
@@ -102,7 +102,7 @@ class MessageController extends AbstractController
                 'id' => $message->getId(),
                 'contenu' => $message->getContenu(),
                 'auteur' => $message->getExpediteur()->getPseudo(),
-                'dateEnvoi' => $message->getDateEnvoi()->format('d/m/Y H:i'),
+                'dateEnvoi' => $this->formatDateForTimezone($message->getDateEnvoi()),
                 'estSysteme' => $message->isEstSysteme()
             ];
         }
@@ -150,5 +150,19 @@ class MessageController extends AbstractController
             'totalNonLus' => $totalNonLus,
             'notifications' => $notifications
         ]);
+    }
+
+    /**
+     * Formate une date avec le fuseau horaire Europe/Paris
+     */
+    private function formatDateForTimezone(\DateTime $date): string
+    {
+        // Cloner la date pour ne pas modifier l'original
+        $localDate = clone $date;
+        
+        // Définir le fuseau horaire Europe/Paris
+        $localDate->setTimezone(new \DateTimeZone($this->getParameter('app.timezone')));
+        
+        return $localDate->format('d/m/Y H:i');
     }
 }
