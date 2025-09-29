@@ -68,7 +68,7 @@ class SortieType extends AbstractType
                 'constraints' => [
                     new NotBlank(['message' => 'La date limite d\'inscription est obligatoire']),
                     new Range([
-                        'min' => 'today',
+                        'min' => 'now',
                         'max' => 'dateHeureDebut',
                         'notInRangeMessage' => 'Vous devez entrer un date entre aujourd\'hui et la sortie'
                     ])
