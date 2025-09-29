@@ -78,16 +78,16 @@
                     {{ form_row(form.ville) }}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.lieu, {'attr': {'disabled': true}}) }}
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.latitude) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_row(form.longitude) }}
+                    <div class="mb-3">
+                        <label class="form-label" for="sortie_lieu">Lieu</label>
+                        <div class="input-group">
+                            {{ form_widget(form.lieu, {'attr': {'disabled': true}}) }}
+                            <button type="button" class="btn btn-outline-success" onclick="console.log('🔧 Bouton cliqué'); openLieuCreateModal();" title="Créer un nouveau lieu">
+                                <i class="bi bi-plus-lg"></i> Nouveau
+                            </button>
+                        </div>
+                        {{ form_errors(form.lieu) }}
+                    </div>
                 </div>
             </div>
         </div>

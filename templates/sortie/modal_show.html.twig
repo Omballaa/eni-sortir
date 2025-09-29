@@ -73,6 +73,16 @@
                         </div>
                     </div>
                     
+                    {# Carte du lieu avec marqueur #}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Localisation :</strong>
+                            <div class="mt-2">
+                                {% include 'includes/lieu_map.html.twig' with {'lieu': sortie.lieu, 'height': '200px'} %}
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Organisateur :</strong></div>
                         <div class="col-sm-8">

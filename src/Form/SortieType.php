@@ -129,24 +129,6 @@ class SortieType extends AbstractType
                 'constraints' => [
                     new NotBlank(['message' => 'Le lieu est obligatoire'])
                 ]
-            ])
-            ->add('latitude', NumberType::class, [
-                'label' => 'Latitude',
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'step' => 'any'
-                ]
-            ])
-            ->add('longitude', NumberType::class, [
-                'label' => 'Longitude',
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'step' => 'any'
-                ]
             ]);
 
         // Gestion dynamique des lieux en fonction de la ville sélectionnée

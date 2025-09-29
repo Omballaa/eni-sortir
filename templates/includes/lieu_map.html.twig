@@ -1,0 +1,56 @@
+{# Template pour afficher une carte de lieu avec marqueur #}
+{# Paramètres: lieu (entité Lieu), height (optionnel, défaut: '300px'), mapId (optionnel) #}
+
+{% set mapId = mapId|default('lieu-map-' ~ lieu.id ~ '-' ~ random()) %}
+{% set mapHeight = height|default('300px') %}
+
+{% if lieu.latitude and lieu.longitude %}
+    <div class="lieu-map-container">
+        <div 
+            id="{{ mapId }}" 
+            class="lieu-map border rounded"
+            style="height: {{ mapHeight }}; width: 100%;"
+            data-latitude="{{ lieu.latitude }}"
+            data-longitude="{{ lieu.longitude }}"
+            data-lieu-nom="{{ lieu.nomLieu }}"
+            data-lieu-adresse="{{ lieu.rue ~ (lieu.ville ? ', ' ~ lieu.ville.nomVille ~ ' (' ~ lieu.ville.codePostal ~ ')' : '') }}"
+        >
+            <!-- Indicateur de chargement -->
+            <div class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement de la carte...</span>
+                    </div>
+                    <p class="mt-2 text-muted small">Chargement de la carte...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informations sous la carte -->
+        <div class="mt-2 text-center">
+            <small class="text-muted">
+                <i class="bi bi-geo-alt"></i> 
+                {{ lieu.nomLieu }}
+                {% if lieu.rue %}
+                    - {{ lieu.rue }}
+                {% endif %}
+                {% if lieu.ville %}
+                    , {{ lieu.ville.nomVille }} ({{ lieu.ville.codePostal }})
+                {% endif %}
+            </small>
+        </div>
+    </div>
+{% else %}
+    <!-- Affichage de fallback si pas de coordonnées GPS -->
+    <div class="alert alert-warning text-center">
+        <i class="bi bi-geo-alt"></i>
+        <h6 class="mb-1">{{ lieu.nomLieu }}</h6>
+        {% if lieu.rue %}
+            <p class="mb-1">{{ lieu.rue }}</p>
+        {% endif %}
+        {% if lieu.ville %}
+            <p class="mb-1">{{ lieu.ville.nomVille }} ({{ lieu.ville.codePostal }})</p>
+        {% endif %}
+        <small class="text-muted">Coordonnées GPS non disponibles</small>
+    </div>
+{% endif %}

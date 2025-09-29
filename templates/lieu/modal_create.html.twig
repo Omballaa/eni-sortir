@@ -1,0 +1,96 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bi bi-geo-alt-fill"></i> Créer un nouveau lieu
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Astuce :</strong> Remplissez l'adresse et la ville, puis cliquez sur "GPS Auto" pour récupérer automatiquement les coordonnées !
+    </div>
+
+    <!-- Formulaire de création de lieu -->
+    {{ form_start(form, {'attr': {'id': 'lieu-form', 'class': 'needs-validation'}}) }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.nomLieu) }}
+                    {{ form_widget(form.nomLieu) }}
+                    {{ form_errors(form.nomLieu) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.ville) }}
+                    {{ form_widget(form.ville) }}
+                    {{ form_errors(form.ville) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    {{ form_label(form.rue) }}
+                    <div class="input-group">
+                        {{ form_widget(form.rue) }}
+                        <button type="button" class="btn btn-outline-secondary" id="geocode-btn" title="Récupérer les coordonnées GPS automatiquement">
+                            <i class="bi bi-geo-alt"></i> GPS Auto
+                        </button>
+                    </div>
+                    {{ form_errors(form.rue) }}
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Cliquez sur "GPS Auto" pour récupérer automatiquement les coordonnées
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-pin-map"></i> Coordonnées GPS
+                    <small class="text-muted">(automatiques ou manuelles)</small>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.latitude) }}
+                            {{ form_widget(form.latitude) }}
+                            {{ form_errors(form.latitude) }}
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Entre -90 et 90
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.longitude) }}
+                            {{ form_widget(form.longitude) }}
+                            {{ form_errors(form.longitude) }}
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Entre -180 et 180
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages d'erreur et de succès -->
+        <div id="lieu-form-messages"></div>
+    {{ form_end(form) }}
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        <i class="bi bi-x-lg"></i> Annuler
+    </button>
+    <button type="submit" form="lieu-form" class="btn btn-success">
+        <i class="bi bi-check-lg"></i> Créer le lieu
+    </button>
+</div>
