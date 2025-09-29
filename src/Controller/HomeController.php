@@ -125,11 +125,11 @@ class HomeController extends AbstractController
 
         if (!$sortiesPassees) {
             $sorties = array_filter($sorties, function($sortie) {
-                return $sortie->getEtat()->getLibelle() !== 'Clôturée' && $sortie->getEtat()->getLibelle() !== 'Annulée';
+                return $sortie->getDateHeureDebut()>= new \DateTime();
             });
         } else {
             $sorties = array_filter($sorties, function($sortie){
-                return  $sortie->getEtat()->getLibelle() == 'Clôtûrée' || $sortie->getEtat()->getLibelle() == 'Annulée';
+                return $sortie->getDateHeureDebut()<= new \DateTime();
             });
         }
 
