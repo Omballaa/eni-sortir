@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\Table(name: 'sites')]
+#[\Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['nomSite'], message: 'Ce site existe déjà.')]
 class Site
 {
     #[ORM\Id]
@@ -42,6 +43,7 @@ class Site
 
     public function setNomSite(string $nomSite): static
     {
+        $nomSite = mb_strtoupper($nomSite);
         $this->nomSite = $nomSite;
 
         return $this;
