@@ -3,11 +3,14 @@
 namespace App\Command;
 
 use App\Entity\Etat;
+use App\Entity\Sortie;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:cloture-sorties',
@@ -30,6 +33,7 @@ class ClotureSortiesCommand extends Command
         $io->title('Clôture des sorties');
 
         try {
+            $now = new \DateTime();
             $sorties = $this->entityManager->getRepository(Sortie::class)->findAll();
             $etatCloturee = $this->entityManager->getRepository(Etat::class)->findOneBy(['libelle' => 'Clôturée']);
             
@@ -47,20 +51,20 @@ class ClotureSortiesCommand extends Command
             $count = 0;
 
             foreach ($sorties as $sortie) {
-            if (
-                $sortie->getDateHeureDebut() < $now &&
-                $sortie->getEtat()->getLibelle() !== 'Annulée' &&
-                $sortie->getEtat()->getLibelle() !== 'Clôturée'
-            ) {
-                $sortie->setEtat($etatCloturee);
-                $count++;
+                if (
+                    $sortie->getDateHeureDebut() < $now &&
+                    $sortie->getEtat()->getLibelle() !== 'Annulée' &&
+                    $sortie->getEtat()->getLibelle() !== 'Clôturée'
+                ) {
+                    $sortie->setEtat($etatCloturee);
+                    $count++;
+                }
             }
-        }
             
-        $this->entityManager->flush();
-        $io->success("$count sorties clôturées.");
+            $this->entityManager->flush();
+            $io->success("$count sorties clôturées.");
 
-        return Command::SUCCESS;
+            return Command::SUCCESS;
 
 
         } catch (\Throwable $th) {
