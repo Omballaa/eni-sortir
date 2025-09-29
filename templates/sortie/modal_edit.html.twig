@@ -51,7 +51,14 @@
             
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(form.dateLimiteInscription) }}
+                    {{ form_row(form.dateLimiteInscription, {
+                        'attr': {
+                            'readonly': false,
+                            'onkeydown': 'return false;',
+                            'onpaste': 'return false;',
+                            'ondrop': 'return false;'
+                        }
+                    }) }}
                 </div>
                 <div class="col-md-6">
                     {{ form_row(form.nbInscriptionsMax) }}

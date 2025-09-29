@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -59,19 +60,16 @@ class SortieType extends AbstractType
                     ])
                 ]
             ])
-            ->add('dateLimiteInscription', DateTimeType::class, [
+            ->add('dateLimiteInscription', DateType::class, [
                 'label' => 'Date limite d\'inscription',
                 'widget' => 'single_text',
                 'attr' => [
-                    'class' => 'form-control'
+                    'class' => 'form-control',
+                    'min' => (new \DateTime('today'))->format('Y-m-d') // HTML5 min attribute
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'La date limite d\'inscription est obligatoire']),
-                    new Range([
-                        'min' => 'now',
-                        'max' => 'dateHeureDebut',
-                        'notInRangeMessage' => 'Vous devez entrer un date entre aujourd\'hui et la sortie'
-                    ])
+                    new NotBlank(['message' => 'La date limite d\'inscription est obligatoire'])
+                    // La validation des dates est gérée par la méthode validateDateLimiteInscription() dans l'entité
                 ]
             ])
             ->add('nbInscriptionsMax', IntegerType::class, [
