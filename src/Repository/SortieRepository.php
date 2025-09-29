@@ -40,7 +40,7 @@ class SortieRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->where('s.organisateur = :organisateur')
             ->setParameter('organisateur', $organisateurId)
-            ->orderBy('s.dateHeureDebut', 'DESC')
+            ->orderBy('s.dateHeureDebut', 'ASC')
             ->getQuery()
             ->getResult();
     }
