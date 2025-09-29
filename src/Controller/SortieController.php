@@ -156,7 +156,7 @@ class SortieController extends AbstractController
         }
 
         // Vérifier que la sortie peut être annulée
-        $etatsAnnulables = ['Créée', 'Ouverte', 'Clôturée'];
+        $etatsAnnulables = ['Ouverte'];
         if (!in_array($sortie->getEtat()->getLibelle(), $etatsAnnulables)) {
             $this->addFlash('error', 'Cette sortie ne peut pas être annulée.');
             return $this->redirectToRoute('app_sortie_show', ['id' => $sortie->getId()]);
