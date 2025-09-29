@@ -139,12 +139,26 @@
             </button>
         </div>
         <div class="card-body p-0" id="sorties-container">
-            {{ include('home/_sorties_list.html.twig', {'sorties': sorties, 'user': user}) }}
+            {% if sorties|length > 0 %}
+                {{ include('home/_sorties_list.html.twig', {'sorties': sorties, 'user': user}) }}
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="text-muted mt-3">Chargement des sorties...</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Chargement automatique des sorties au démarrage
+            setTimeout(() => {
+                refreshSortiesList();
+            }, 100);
+            
             // Auto-refresh optionnel sur changement de certains filtres
             const siteSelect = document.getElementById('site');
             if (siteSelect) {
