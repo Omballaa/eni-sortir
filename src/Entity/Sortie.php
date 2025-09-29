@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,6 +28,7 @@ class Sortie
     private ?int $duree = null;
 
     #[ORM\Column(name: 'date_limite_inscription', type: Types::DATE_MUTABLE)]
+    #[Assert\LessThan(propertyPath: 'dateHeureDebut', message: "La date limite d'inscription doit être avant la date de début.")]
     private ?\DateTimeInterface $dateLimiteInscription = null;
 
     #[ORM\Column(name: 'nb_inscriptions_max', type: 'integer')]

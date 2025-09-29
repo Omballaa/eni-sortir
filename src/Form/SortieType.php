@@ -21,8 +21,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
+use Symfony\Component\Validator\Constraints\Range;
 
 class SortieType extends AbstractType
 {
@@ -57,14 +59,19 @@ class SortieType extends AbstractType
                     ])
                 ]
             ])
-            ->add('dateLimiteInscription', DateType::class, [
+            ->add('dateLimiteInscription', DateTimeType::class, [
                 'label' => 'Date limite d\'inscription',
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'La date limite d\'inscription est obligatoire'])
+                    new NotBlank(['message' => 'La date limite d\'inscription est obligatoire']),
+                    new Range([
+                        'min' => 'today',
+                        'max' => 'dateHeureDebut',
+                        'notInRangeMessage' => 'Vous devez entrer un date entre aujourd\'hui et la sortie'
+                    ])
                 ]
             ])
             ->add('nbInscriptionsMax', IntegerType::class, [
@@ -197,6 +204,7 @@ class SortieType extends AbstractType
                 }
             }
         );
+               
     }
 
     public function configureOptions(OptionsResolver $resolver): void

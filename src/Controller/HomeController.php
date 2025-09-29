@@ -84,8 +84,13 @@ class HomeController extends AbstractController
         }
 
         if (!$sortiesPassees) {
-            $now = new \DateTime();
-            $sorties = array_filter($sorties, fn($sortie) => $sortie->getDateHeureDebut() >= $now);
+            $sorties = array_filter($sorties, function($sortie) {
+                return $sortie->getEtat()->getLibelle() !== 'Clotûrée' && $sortie->getEtat()->getLibelle() !== 'Annulée';
+            });
+        } else {
+            $sorties = array_filter($sorties, function($sortie) {
+                return  $sortie->getEtat()->getLibelle() == 'Clotûrée' || $sortie->getEtat()->getLibelle() == 'Annulée'; 
+            });
         }
 
         // Récupération des données pour les formulaires de filtres
@@ -178,8 +183,13 @@ class HomeController extends AbstractController
         }
 
         if (!$sortiesPassees) {
-            $now = new \DateTime();
-            $sorties = array_filter($sorties, fn($sortie) => $sortie->getDateHeureDebut() >= $now);
+            $sorties = array_filter($sorties, function($sortie) {
+                return $sortie->getEtat()->getLibelle() !== 'Clotûrée' && $sortie->getEtat()->getLibelle() !== 'Annulée';
+            });
+        } else {
+            $sorties = array_filter($sorties, function($sortie){
+                return  $sortie->getEtat()->getLibelle() == 'Clotûrée' || $sortie->getEtat()->getLibelle() == 'Annulée'; 
+            });
         }
 
         // Retourner seulement le template de la liste des sorties
