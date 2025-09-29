@@ -54,6 +54,7 @@ class ClotureSortiesCommand extends Command
                 if (
                     $sortie->getDateHeureDebut() < $now &&
                     $sortie->getEtat()->getLibelle() !== 'Annulée' &&
+                    $sortie->getEtat()->getLibelle() !== 'Créée' &&
                     $sortie->getEtat()->getLibelle() !== 'Clôturée'
                 ) {
                     $sortie->setEtat($etatCloturee);
