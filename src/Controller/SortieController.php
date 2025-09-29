@@ -475,6 +475,11 @@ class SortieController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Cette sortie n\'est pas ouverte aux inscriptions.']);
         }
         
+        // Vérifier si les inscriptions sont encore ouvertes (date limite)
+        if (!$sortie->isInscriptionOuverte()) {
+            return $this->json(['success' => false, 'message' => 'La date limite d\'inscription est dépassée.']);
+        }
+        
         if (count($sortie->getInscriptions()) >= $sortie->getNbInscriptionsMax()) {
             return $this->json(['success' => false, 'message' => 'Cette sortie est complète.']);
         }

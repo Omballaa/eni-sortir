@@ -226,8 +226,11 @@ class Sortie
      */
     public function isInscriptionOuverte(): bool
     {
-        $now = new \DateTime();
-        return $this->dateLimiteInscription >= $now && !$this->isComplete();
+        // Comparer uniquement les dates (pas l'heure) pour permettre l'inscription jusqu'à la fin du jour limite
+        $today = new \DateTime('today');
+        $dateLimite = new \DateTime($this->dateLimiteInscription->format('Y-m-d'));
+        
+        return $dateLimite >= $today && !$this->isComplete();
     }
 
     public function __toString(): string
