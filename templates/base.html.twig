@@ -11,6 +11,9 @@
         {# Icônes Bootstrap #}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
         
+        {# Leaflet CSS pour les cartes #}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        
         {% block stylesheets %}
             {# Aucun CSS personnalisé - uniquement Bootstrap #}
         {% endblock %}
@@ -19,12 +22,19 @@
             {# Bootstrap JS via CDN #}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
             
+            {# Leaflet JS pour les cartes #}
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+            
             {# Utils.js - Fonctions utilitaires pour toasts, modales et AJAX #}
             <script src="{{ asset('js/utils.js') }}"></script>
+            
+            {# Composant carte #}
+            <script src="{{ asset('js/map.component.js') }}"></script>
             
             {# Modales spécialisées #}
             <script src="{{ asset('js/profil.modal.js') }}"></script>
             <script src="{{ asset('js/sortie.modal.js') }}"></script>
+            <script src="{{ asset('js/lieu.modal.js') }}"></script>
             
 
         {% endblock %}

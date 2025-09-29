@@ -21,8 +21,16 @@
         <div class="col-12">
             <div class="mb-3">
                 {{ form_label(form.rue) }}
-                {{ form_widget(form.rue) }}
+                <div class="input-group">
+                    {{ form_widget(form.rue) }}
+                    <button type="button" class="btn btn-outline-secondary" id="geocode-btn" title="Récupérer les coordonnées GPS automatiquement">
+                        <i class="bi bi-geo-alt"></i> GPS Auto
+                    </button>
+                </div>
                 {{ form_errors(form.rue) }}
+                <small class="form-text text-muted">
+                    <i class="bi bi-info-circle me-1"></i>Cliquez sur "GPS Auto" pour récupérer automatiquement les coordonnées
+                </small>
             </div>
         </div>
     </div>

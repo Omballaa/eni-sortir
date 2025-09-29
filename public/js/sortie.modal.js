@@ -196,7 +196,6 @@ class SortieModal {
 
         devLog('✅ Formulaire création trouvé:', form.id);
         this.initCommonFormFeatures(form);
-        this.setupDateTimeValidation(form);
         this.setupLieuxLoading(form);
         devLog('🆕 === FIN initCreateForm ===');
     }
@@ -220,10 +219,7 @@ class SortieModal {
         // 2. Initialiser les fonctionnalités communes
         this.initCommonFormFeatures(form);
         
-        // 3. Configurer la validation des dates
-        this.setupDateTimeValidation(form);
-        
-        // 4. Configurer le chargement des lieux (après les données originales)
+        // 3. Configurer le chargement des lieux (après les données originales)
         this.setupLieuxLoading(form);
         
         devLog('📝 === FIN initEditForm ===');
@@ -570,48 +566,9 @@ class SortieModal {
             showToast('Valeurs originales restaurées', 'info');
         }
     }
-    setupDateTimeValidation(form) {
-        const dateDebutInput = form.querySelector('input[name*="dateHeureDebut"]');
-        const dateLimiteInput = form.querySelector('input[name*="dateLimiteInscription"]');
-        
-        if (dateDebutInput && dateLimiteInput) {
-            [dateDebutInput, dateLimiteInput].forEach(input => {
-                input.addEventListener('change', () => {
-                    this.validateDates(dateDebutInput, dateLimiteInput);
-                });
-            });
-        }
-    }
 
-    /**
-     * Validation des dates
-     */
-    validateDates(dateDebutInput, dateLimiteInput) {
-        const dateDebut = new Date(dateDebutInput.value);
-        const dateLimite = new Date(dateLimiteInput.value);
-        const now = new Date();
 
-        let isValid = true;
 
-        // Date de début dans le futur
-        if (dateDebut <= now) {
-            this.showFieldError(dateDebutInput, 'La date doit être dans le futur');
-            isValid = false;
-        }
-
-        // Date limite avant date de début
-        if (dateLimite >= dateDebut) {
-            this.showFieldError(dateLimiteInput, 'La date limite doit être avant la date de début');
-            isValid = false;
-        }
-
-        if (isValid) {
-            dateDebutInput.classList.add('is-valid');
-            dateLimiteInput.classList.add('is-valid');
-        }
-
-        return isValid;
-    }
 
     /**
      * Gère la création d'une sortie
@@ -765,15 +722,6 @@ class SortieModal {
                 isValid = false;
             }
         });
-
-        // Validation des dates
-        const dateDebutInput = form.querySelector('input[name*="dateHeureDebut"]');
-        const dateLimiteInput = form.querySelector('input[name*="dateLimiteInscription"]');
-        if (dateDebutInput && dateLimiteInput) {
-            if (!this.validateDates(dateDebutInput, dateLimiteInput)) {
-                isValid = false;
-            }
-        }
 
         // Validation du nombre max d'inscriptions
         const nbMaxInput = form.querySelector('input[name*="nbInscriptionsMax"]');

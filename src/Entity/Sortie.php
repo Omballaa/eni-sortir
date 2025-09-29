@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,13 +23,14 @@ class Sortie
     private ?string $nom = null;
 
     #[ORM\Column(name: 'date_heure_debut', type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: 'La date et heure de début de la sortie sont obligatoires')]
     private ?\DateTimeInterface $dateHeureDebut = null;
 
     #[ORM\Column(name: 'duree', type: 'integer', nullable: true)]
     private ?int $duree = null;
 
     #[ORM\Column(name: 'date_limite_inscription', type: Types::DATE_MUTABLE)]
-    #[Assert\LessThan(propertyPath: 'dateHeureDebut', message: "La date limite d'inscription doit être avant la date de début.")]
+    #[Assert\NotBlank(message: 'La date limite d\'inscription est obligatoire')]
     private ?\DateTimeInterface $dateLimiteInscription = null;
 
     #[ORM\Column(name: 'nb_inscriptions_max', type: 'integer')]
@@ -224,12 +226,44 @@ class Sortie
      */
     public function isInscriptionOuverte(): bool
     {
-        $now = new \DateTime();
-        return $this->dateLimiteInscription >= $now && !$this->isComplete();
+        // Comparer uniquement les dates (pas l'heure) pour permettre l'inscription jusqu'à la fin du jour limite
+        $today = new \DateTime('today');
+        $dateLimite = new \DateTime($this->dateLimiteInscription->format('Y-m-d'));
+        
+        return $dateLimite >= $today && !$this->isComplete();
     }
 
     public function __toString(): string
     {
         return $this->nom . ' - ' . $this->dateHeureDebut->format('d/m/Y H:i');
+    }
+
+    /**
+     * Validation personnalisée pour vérifier que la date limite d'inscription est cohérente
+     */
+    #[Assert\Callback]
+    public function validateDateLimiteInscription(ExecutionContextInterface $context): void
+    {
+        if ($this->dateLimiteInscription && $this->dateHeureDebut) {
+            // Utiliser midnight pour une comparaison correcte avec une date seule
+            $today = new \DateTime('today midnight');
+            
+            // Créer une version date seule de la date limite pour une comparaison cohérente
+            $dateLimite = new \DateTime($this->dateLimiteInscription->format('Y-m-d') . ' 00:00:00');
+            
+            // Vérifier que la date limite est >= aujourd'hui
+            if ($dateLimite < $today) {
+                $context->buildViolation('La date limite d\'inscription ne peut pas être dans le passé')
+                    ->atPath('dateLimiteInscription')
+                    ->addViolation();
+            }
+            
+            // Vérifier que la date limite est <= date de début (elle peut être égale)
+            if ($this->dateLimiteInscription > $this->dateHeureDebut) {
+                $context->buildViolation('La date limite d\'inscription doit être antérieure ou égale à la date de début de la sortie')
+                    ->atPath('dateLimiteInscription')
+                    ->addViolation();
+            }
+        }
     }
 }

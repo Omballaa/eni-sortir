@@ -6,6 +6,7 @@ use App\Entity\Lieu;
 use App\Form\LieuType;
 use App\Repository\LieuRepository;
 use App\Repository\VilleRepository;
+use App\Service\GeocodingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -62,15 +63,26 @@ class LieuController extends AbstractController
     }
 
     #[Route('/form-modal', name: 'app_lieu_form_modal', methods: ['GET'])]
-    public function getFormModal(VilleRepository $villeRepository): Response
+    public function getFormModal(Request $request, VilleRepository $villeRepository): Response
     {
         $lieu = new Lieu();
+        
+        // Pré-sélectionner la ville si fournie en paramètre
+        $villeId = $request->query->get('ville_id');
+        if ($villeId) {
+            $ville = $villeRepository->find($villeId);
+            if ($ville) {
+                $lieu->setVille($ville);
+            }
+        }
+        
         $form = $this->createForm(LieuType::class, $lieu);
         $villes = $villeRepository->findAll();
 
-        return $this->render('lieu/_form_modal.html.twig', [
+        return $this->render('lieu/modal_create.html.twig', [
             'form' => $form,
-            'villes' => $villes
+            'villes' => $villes,
+            'selectedVilleId' => $villeId
         ]);
     }
 
@@ -95,5 +107,53 @@ class LieuController extends AbstractController
         }
         
         return $this->json($lieuxData);
+    }
+
+    #[Route('/geocode', name: 'app_lieu_geocode', methods: ['POST'])]
+    public function geocode(Request $request, GeocodingService $geocodingService, VilleRepository $villeRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        
+        $rue = $data['rue'] ?? '';
+        $villeId = $data['ville_id'] ?? null;
+        
+        if (empty($rue) || !$villeId) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Adresse et ville requises'
+            ], 400);
+        }
+        
+        // Récupérer les informations de la ville
+        $ville = $villeRepository->find($villeId);
+        if (!$ville) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Ville non trouvée'
+            ], 400);
+        }
+        
+        // Géocoder l'adresse
+        $coordinates = $geocodingService->geocodeSimpleAddress(
+            $rue,
+            $ville->getNomVille(),
+            $ville->getCodePostal()
+        );
+        
+        if ($coordinates) {
+            return new JsonResponse([
+                'success' => true,
+                'latitude' => $coordinates['latitude'],
+                'longitude' => $coordinates['longitude'],
+                'confidence' => $coordinates['confidence'],
+                'display_name' => $coordinates['display_name'],
+                'message' => 'Coordonnées trouvées avec succès'
+            ]);
+        } else {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Impossible de trouver les coordonnées pour cette adresse'
+            ], 404);
+        }
     }
 }
