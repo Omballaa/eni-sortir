@@ -259,35 +259,6 @@ function showValidationFeedback(input, feedbackDiv, type, message) {
 }
 
 /**
- * Met à jour l'état du bouton de soumission
- */
-function updateSubmitButton() {
-    const submitButton = document.querySelector('button[type="submit"]');
-    if (!submitButton) return;
-
-    const inputs = document.querySelectorAll('#registration_form_pseudo, #registration_form_mail, #registration_form_plainPassword, #registration_form_confirmPassword');
-    let allValid = true;
-
-    inputs.forEach(input => {
-        if (input && (!input.classList.contains('is-valid') || input.value.trim() === '')) {
-            allValid = false;
-        }
-    });
-
-    submitButton.disabled = !allValid;
-    
-    if (allValid) {
-        submitButton.classList.remove('btn-secondary');
-        submitButton.classList.add('btn-primary');
-        submitButton.innerHTML = '<i class="bi bi-person-plus"></i> Créer mon compte';
-    } else {
-        submitButton.classList.remove('btn-primary');
-        submitButton.classList.add('btn-secondary');
-        submitButton.innerHTML = '<i class="bi bi-hourglass"></i> Complétez le formulaire';
-    }
-}
-
-/**
  * Gère la soumission AJAX du formulaire d'enregistrement
  */
 function handleFormSubmit() {

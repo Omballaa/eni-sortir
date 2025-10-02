@@ -60,6 +60,38 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6 mt-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-newspaper fa-3x opacity-75"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="h3 mb-0" id="sortiesCount">{{ stats.total_sorties }}</div>
+                            <div>Sorties</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-users fa-3x opacity-75"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="h3 mb-0" id="profilsCount">{{ stats.total_profils }}</div>
+                            <div>Profils</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Gestion des données -->
@@ -108,6 +140,43 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Gestion des Sorties -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fas fa-newspaper fa-4x text-warning"></i>
+                                    </div>
+                                    <h5 class="card-title">Gestion des Sorties</h5>
+                                    <p class="card-text text-muted">
+                                        Ajouter, modifier ou supprimer les différentes sorties.
+                                    </p>
+                                    <button type="button" class="btn btn-warning" id="manageSortiesBtn">
+                                        <i class="fas fa-edit me-2"></i>Gérer les Sorties
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gestion des Profils -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-danger">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fas fa-users fa-4x text-danger"></i>
+                                    </div>
+                                    <h5 class="card-title">Gestion des Profils</h5>
+                                    <p class="card-text text-muted">
+                                        Ajouter, modifier ou supprimer les différentes utilisateurs.
+                                    </p>
+                                    <button type="button" class="btn btn-danger" id="manageProfilsBtn">
+                                        <i class="fas fa-edit me-2"></i>Gérer les Profils
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -130,6 +199,12 @@
                         </button>
                         <button type="button" class="btn btn-outline-success" id="addSiteBtn">
                             <i class="fas fa-plus me-1"></i>Nouveau site
+                        </button>
+                         <button type="button" class="btn btn-outline-warning" id="addSortieBtn">
+                            <i class="fas fa-plus me-1"></i>Nouvelle sortie
+                        </button>
+                         <button type="button" class="btn btn-outline-danger" id="addProfilBtn">
+                            <i class="fas fa-plus me-1"></i>Nouveau utilisateur
                         </button>
                     </div>
                 </div>
@@ -255,6 +330,126 @@
     </div>
 </div>
 
+<!-- Modal Gestion des Sorties -->
+<div class="modal fade" id="sortiesModal" tabindex="-1" aria-labelledby="sortiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sortiesModalLabel">
+                    <i class="fas fa-newspaper me-2"></i>Gestion des Sorties
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Barre de recherche -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchSorties" placeholder="Rechercher par nom...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning w-100" id="addSortieModalBtn">
+                            <i class="fas fa-plus me-1"></i>Nouvelle sortie
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zone de messages -->
+                <div id="sortiesMessages"></div>
+
+                <!-- Tableau des sorties -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>Organisateur</th>
+                                <th>État</th>
+                                <th>Participants</th>
+                                <th width="220">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sortiesTableBody">
+                            <!-- Contenu dynamique -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Pagination sorties">
+                    <ul class="pagination justify-content-center" id="sortiesPagination">
+                        <!-- Pagination dynamique -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Gestion des Profils -->
+<div class="modal fade" id="profilsModal" tabindex="-1" aria-labelledby="profilsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profilsModalLabel">
+                    <i class="fas fa-users me-2"></i>Gestion des Profils
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Barre de recherche -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchProfils" placeholder="Rechercher par pseudo, nom ou prénom...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger w-100" id="addProfilModalBtn">
+                            <i class="fas fa-plus me-1"></i>Nouveau utilisateur
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zone de messages -->
+                <div id="profilsMessages"></div>
+
+                <!-- Tableau des profils -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Pseudo</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th width="180">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profilsTableBody">
+                            <!-- Contenu dynamique -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Pagination profils">
+                    <ul class="pagination justify-content-center" id="profilsPagination">
+                        <!-- Pagination dynamique -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal pour les formulaires -->
 <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -272,6 +467,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSitePage = 1;
     let villeSearchTimeout;
     let siteSearchTimeout;
+    let sortieSearchTimeout;
+    let profilSearchTimeout;
 
     // === GESTION DES MODALES PRINCIPALES ===
     
@@ -284,6 +481,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('manageSitesBtn').addEventListener('click', function() {
         openSitesModal();
     });
+    
+    // Bouton gérer les sorties
+    document.getElementById('manageSortiesBtn').addEventListener('click', function() {
+        openSortiesModal();
+    });
+
+    // Bouton gérer les profils
+    document.getElementById('manageProfilsBtn').addEventListener('click', function() {
+        openProfilsModal();
+    }); 
 
     // Actions rapides
     document.getElementById('addVilleBtn').addEventListener('click', function() {
@@ -295,6 +502,16 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Bouton addSiteBtn cliqué');
         openSiteForm();
     });
+
+    document.getElementById('addSortieBtn').addEventListener('click', function() {
+        console.log('Bouton addSortieBtn cliqué');
+        openSortieForm();
+    });
+
+    document.getElementById('addProfilBtn').addEventListener('click', function() {
+        console.log('Bouton addProfilBtn cliqué');
+        openProfilForm();
+    }); 
 
     // === GESTION DES VILLES ===
 
@@ -411,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
-    function loadSites(page = 1) {
+    window.loadSites = function(page = 1) {
         const search = document.getElementById('searchSites').value;
         currentSitePage = page;
 
@@ -483,6 +700,202 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // === GESTION DES SORTIES ===
+
+    function openSortiesModal() {
+        loadSorties();
+        new bootstrap.Modal(document.getElementById('sortiesModal')).show();
+    }
+
+    // Bouton ajouter sortie dans modal
+    document.getElementById('addSortieModalBtn').addEventListener('click', function() {
+        openSortieForm();
+    });
+
+    // Recherche sorties
+    document.getElementById('searchSorties').addEventListener('input', function() {
+        clearTimeout(sortieSearchTimeout);
+        sortieSearchTimeout = setTimeout(() => {
+            currentSortiePage = 1;
+            loadSorties();
+        }, 300);
+    });
+
+    window.loadSorties = function(page = 1) {
+        const search = document.getElementById('searchSorties').value;
+        currentSortiePage = page;
+
+        fetch(`{{ path('app_admin_sorties_data') }}?search=${encodeURIComponent(search)}&page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySorties(data.sorties);
+                displaySortiesPagination(data.page, data.pages);
+            })
+            .catch(error => {
+                showMessage('sortiesMessages', 'Erreur lors du chargement des sorties.', 'danger');
+            });
+    }
+
+    function displaySorties(sorties) {
+        const tbody = document.getElementById('sortiesTableBody');
+        tbody.innerHTML = '';
+
+            sorties.forEach(sortie => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${sortie.nom}</strong></td>
+                    <td>${sortie.dateHeureDebut}</td>
+                    <td>${sortie.organisateur}</td>
+                    <td><span class="badge bg-info">${sortie.etat}</span></td>
+                    <td><span class="badge bg-secondary">${sortie.nbParticipants}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editSortie(${sortie.id})" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSortie(${sortie.id}, '${sortie.nom}')" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="publishSortie(${sortie.id})" title="Publier">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="openSortieCancelModal(${sortie.id})" title="Annuler">
+                            <i class="bi bi-lock"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+    function displaySortiesPagination(current, total) {
+        const pagination = document.getElementById('sortiesPagination');
+        pagination.innerHTML = '';
+
+        if (total <= 1) return;
+
+        // Bouton précédent
+        if (current > 1) {
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadSorties(${current - 1})">Précédent</a>
+                </li>
+            `;
+        }
+
+        // Pages
+        for (let i = 1; i <= total; i++) {
+            const active = i === current ? 'active' : '';
+            pagination.innerHTML += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="loadSorties(${i})">${i}</a>
+                </li>
+            `;
+        }
+
+        // Bouton suivant
+        if (current < total) {
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadSorties(${current + 1})">Suivant</a>
+                </li>
+            `;
+        }
+    }
+
+    // === GESTION DES PROFILS ===
+
+    function openProfilsModal() {
+        loadProfils();
+        new bootstrap.Modal(document.getElementById('profilsModal')).show();
+    }
+
+    // Bouton ajouter profil dans modal
+    document.getElementById('addProfilModalBtn').addEventListener('click', function() {
+        openProfilForm();
+    });
+
+    // Recherche profils
+    document.getElementById('searchProfils').addEventListener('input', function() {
+        clearTimeout(profilSearchTimeout);
+        profilSearchTimeout = setTimeout(() => {
+            currentProfilPage = 1;
+            loadProfils();
+        }, 300);
+    });
+
+    window.loadProfils = function(page = 1) {
+        const search = document.getElementById('searchProfils').value;
+        currentProfilPage = page;
+
+        fetch(`{{ path('app_admin_profils_data') }}?search=${encodeURIComponent(search)}&page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                displayProfils(data.participants);
+                displayProfilsPagination(data.page, data.pages);
+            })
+            .catch(error => {
+                showMessage('profilsMessages', 'Erreur lors du chargement des profils.', 'danger');
+            });
+    }
+
+    function displayProfils(profils) {
+        const tbody = document.getElementById('profilsTableBody');
+        tbody.innerHTML = '';
+
+        profils.forEach(profil => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${profil.pseudo}</strong></td>
+                <td>${profil.nom}</td>
+                <td>${profil.prenom}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="editProfil(${profil.id})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteProfil(${profil.id}, '${profil.pseudo}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function displayProfilsPagination(current, total) {
+        const pagination = document.getElementById('profilsPagination');
+        pagination.innerHTML = '';
+
+        if (total <= 1) return;
+
+        // Bouton précédent
+        if (current > 1) {
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadProfils(${current - 1})">Précédent</a>
+                </li>
+            `;
+        }
+
+        // Pages
+        for (let i = 1; i <= total; i++) {
+            const active = i === current ? 'active' : '';
+            pagination.innerHTML += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="loadProfils(${i})">${i}</a>
+                </li>
+            `;
+        }
+
+        // Bouton suivant
+        if (current < total) {
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadProfils(${current + 1})">Suivant</a>
+                </li>
+            `;
+        }
+    }
+    
     // === FONCTIONS FORMULAIRES ===
 
     window.openVilleForm = function(id = null) {
@@ -525,12 +938,58 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     };
 
+    window.openSortieForm = function(id = null) {
+        console.log('openSortieForm appelée avec id:', id);
+        const url = id ? `{{ path('app_admin_sortie_form') }}/${id}` : `{{ path('app_admin_sortie_form') }}`;
+        
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                console.log('Formulaire sortie chargé');
+                document.getElementById('formModalContent').innerHTML = html;
+                
+                attachSortieFormEvents(id);
+                
+                new bootstrap.Modal(document.getElementById('formModal')).show();
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du formulaire sortie:', error);
+            });
+    };
+
+    window.openProfilForm = function(id = null) {
+        console.log('openProfilForm appelée avec id:', id);
+        const url = id ? `{{ path('app_admin_profil_form') }}/${id}` : `{{ path('app_admin_profil_form') }}`;
+        
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                console.log('Formulaire profil chargé');
+                document.getElementById('formModalContent').innerHTML = html;
+                
+                attachProfilFormEvents(id);
+                
+                new bootstrap.Modal(document.getElementById('formModal')).show();
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du formulaire profil:', error);
+            });
+    };
+   
     window.editVille = function(id) {
         openVilleForm(id);
     };
 
     window.editSite = function(id) {
         openSiteForm(id);
+    };
+
+    window.editSortie = function(id) {
+        openSortieForm(id);
+    };
+
+    window.editProfil = function(id) {
+        openProfilForm(id);
     };
 
     // === FONCTIONS SUPPRESSION ===
@@ -571,6 +1030,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    window.deleteSortie = function(id, nom) {
+        if (confirm(`Êtes-vous sûr de vouloir supprimer la sortie "${nom}" ?`)) {
+            fetch(`{{ path('app_admin_sortie_delete', {'id': '__ID__'}) }}`.replace('__ID__', id), {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('sortiesMessages', data.message, 'success');
+                    loadSorties(currentSortiePage);
+                    updateDashboardCounters();
+                } else {
+                    showMessage('sortiesMessages', data.message, 'danger');
+                }
+            });
+        }
+    };
+ 
+    window.deleteProfil = function(id, nom) {
+        if (confirm(`Êtes-vous sûr de vouloir supprimer le profil "${nom}" ?`)) {
+            fetch(`{{ path('app_admin_profil_delete', {'id': '__ID__'}) }}`.replace('__ID__', id), {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('profilsMessages', data.message, 'success');
+                    loadProfils(currentProfilPage);
+                    updateDashboardCounters();
+                } else {
+                    showMessage('profilsMessages', data.message, 'danger');
+                }
+            });
+        }
+    }; 
+
     // === FONCTIONS UTILITAIRES ===
 
     function showMessage(containerId, message, type) {
@@ -606,6 +1101,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'site') {
             loadSites(currentSitePage);
             showMessage('sitesMessages', message, 'success');
+        } else if (type === 'sortie') {
+            loadSorties(currentSortiePage);
+            showMessage('sitesMessages', message, 'success');
+        } else if (type === 'profil') {
+            loadProfils(currentProfilPage);
+            showMessage('sitesMessages', message, 'success');
         }
         
         // Actualiser les compteurs du dashboard
@@ -629,6 +1130,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#sitesCount').textContent = data.total;
             })
             .catch(error => console.error('Erreur lors de la mise à jour du compteur sites:', error));
+
+        // Actualiser le compteur des sorties
+        fetch('{{ path('app_admin_sorties_data') }}?page=1&limit=1')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('#sortiesCount').textContent = data.total;
+            })
+            .catch(error => console.error('Erreur lors de la mise à jour du compteur sorties:', error));
+
+        // Actualiser le compteur des profils
+        fetch('{{ path('app_admin_profils_data') }}?page=1&limit=1')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('#profilsCount').textContent = data.total;
+            })
+            .catch(error => console.error('Erreur lors de la mise à jour du compteur profils:', error));
     }
 
     // Fonctions pour attacher les événements aux formulaires
@@ -685,58 +1202,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function attachSiteFormEvents(id = null) {
-        const form = document.getElementById('siteForm');
-        const submitBtn = document.getElementById('submitSiteBtn');
-        
-        if (!form || !submitBtn) return;
-        
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Soumission formulaire site');
-            
-            // Désactiver le bouton
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Traitement...';
-            
-            const formData = new FormData(form);
-            const url = id ? `{{ path('app_admin_site_save') }}/${id}` : `{{ path('app_admin_site_save') }}`;
-            
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Réponse site:', data);
-                if (data.success) {
-                    window.onFormSuccess(data.message, 'site');
-                } else {
-                    // Afficher les erreurs
-                    let errorHtml = '<div class="alert alert-danger"><ul class="mb-0">';
-                    data.errors.forEach(error => {
-                        errorHtml += `<li>${error}</li>`;
-                    });
-                    errorHtml += '</ul></div>';
-                    
-                    document.getElementById('formMessages').innerHTML = errorHtml;
-                    
-                    // Réactiver le bouton
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>' + (id ? 'Modifier' : 'Créer');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                document.getElementById('formMessages').innerHTML = 
-                    '<div class="alert alert-danger">Une erreur est survenue lors de la sauvegarde.</div>';
-                
-                // Réactiver le bouton
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>' + (id ? 'Modifier' : 'Créer');
-            });
-        });
-    }
 });
 </script>
 {% endblock %}

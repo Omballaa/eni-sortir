@@ -23,13 +23,25 @@ class ProfilType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $isAdmin = $options['is_admin'] ?? false;
+
+        if ($isAdmin) {
+            $pseudoAttr = [
+                'class' => 'form-control',
+                'placeholder' => 'Votre pseudo'
+            ];
+        } else {
+            $pseudoAttr = [
+                'class' => 'form-control bg-secondary text-light',
+                'placeholder' => 'Votre pseudo',
+                'readonly' => 'true',
+                'style' => 'pointer-events: none;'
+            ];
+        }
         $builder
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Votre pseudo'
-                ],
+                'attr' => $pseudoAttr,
                 'constraints' => [
                     new NotBlank(['message' => 'Le pseudo est obligatoire']),
                     new Length([
@@ -143,6 +155,7 @@ class ProfilType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Participant::class,
+            'is_admin' => false,
         ]);
     }
 }

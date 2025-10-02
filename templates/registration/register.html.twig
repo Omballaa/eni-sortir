@@ -47,16 +47,14 @@
 {% endblock %}
 
 {% block body %}
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
-    <div class="row w-100">
-        <div class="col-md-8 col-lg-6 mx-auto">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-4">
+<div class="modal-dialog modal-xl">
+    <div class="modal-content">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center py-4">
                     <h1 class="h3 mb-0">
                         <i class="bi bi-person-plus-fill me-2"></i>
-                        Créer un compte
+                        Création d'un compte
                     </h1>
-                    <p class="mb-0 mt-2">Rejoignez la communauté Sortir ENI</p>
                 </div>
 
                 <div class="card-body p-4">
@@ -76,84 +74,70 @@
                         </div>
                     {% endfor %}
 
-                    {{ form_start(registrationForm, {'attr': {'id': 'registrationForm', 'novalidate': 'novalidate'}}) }}
+                    {{ form_start(form, {'attr': {'id': 'form', 'novalidate': 'novalidate'}}) }}
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.prenom, null, {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
-                            {{ form_errors(registrationForm.prenom) }}
+                            {{ form_label(form.prenom, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
+                            {{ form_errors(form.prenom) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.nom, null, {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
-                            {{ form_errors(registrationForm.nom) }}
+                            {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
+                            {{ form_errors(form.nom) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        {{ form_label(registrationForm.pseudo, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control', 'placeholder': 'Nom d\'utilisateur unique', 'autocomplete': 'username'}}) }}
-                        {{ form_errors(registrationForm.pseudo) }}
+                        {{ form_label(form.pseudo, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.pseudo, {'attr': {'class': 'form-control', 'placeholder': 'Nom d\'utilisateur unique', 'autocomplete': 'username'}}) }}
+                        {{ form_errors(form.pseudo) }}
                     </div>
 
                     <div class="mb-3">
-                        {{ form_label(registrationForm.mail, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(registrationForm.mail, {'attr': {'class': 'form-control', 'placeholder': 'votre.email@example.com', 'autocomplete': 'email'}}) }}
-                        {{ form_errors(registrationForm.mail) }}
+                        {{ form_label(form.mail, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.mail, {'attr': {'class': 'form-control', 'placeholder': 'votre.email@example.com', 'autocomplete': 'email'}}) }}
+                        {{ form_errors(form.mail) }}
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.telephone, null, {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.telephone, {'attr': {'class': 'form-control', 'placeholder': '06 12 34 56 78'}}) }}
-                            {{ form_errors(registrationForm.telephone) }}
+                            {{ form_label(form.telephone, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.telephone, {'attr': {'class': 'form-control', 'placeholder': '06 12 34 56 78'}}) }}
+                            {{ form_errors(form.telephone) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.site, null, {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.site, {'attr': {'class': 'form-select'}}) }}
-                            {{ form_errors(registrationForm.site) }}
+                            {{ form_label(form.site, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.site, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_errors(form.site) }}
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Minimum 8 caractères', 'autocomplete': 'new-password'}}) }}
-                            {{ form_errors(registrationForm.plainPassword.first) }}
+                            {{ form_label(form.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Minimum 8 caractères', 'autocomplete': 'new-password'}}) }}
+                            {{ form_errors(form.plainPassword.first) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Répétez le mot de passe', 'autocomplete': 'new-password'}}) }}
-                            {{ form_errors(registrationForm.plainPassword.second) }}
+                            {{ form_label(form.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Répétez le mot de passe', 'autocomplete': 'new-password'}}) }}
+                            {{ form_errors(form.plainPassword.second) }}
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-secondary btn-lg" disabled>
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-hourglass"></i>
-                            Complétez le formulaire
+                            Créer le compte
                         </button>
                     </div>
 
-                    {{ form_end(registrationForm) }}
-
+                    {{ form_end(form) }} 
                     <hr class="my-4">
 
-                    <div class="text-center">
-                        <p class="text-muted mb-2">Vous avez déjà un compte ?</p>
-                        <a href="{{ path('app_login') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>
-                            Se connecter
-                        </a>
-                    </div>
                 </div>
-            </div>
-
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    En créant un compte, vous acceptez les conditions d'utilisation de Sortir ENI.
-                </small>
             </div>
         </div>
     </div>

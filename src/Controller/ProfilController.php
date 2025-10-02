@@ -87,8 +87,9 @@ class ProfilController extends AbstractController
         /** @var Participant $currentUser */
         $currentUser = $this->getUser();
         
-        // Sécurité : on ne peut modifier que son propre profil
-        if ((int)$id !== $currentUser->getId()) {
+        // Sécurité : on ne peut modifier que son propre profil, sauf si admin
+        $isAdmin = in_array('ROLE_ADMIN', $currentUser->getRoles());
+        if ((int)$id !== $currentUser->getId() && !$isAdmin) {
             error_log("ProfilController::editModal - Accès refusé pour l'utilisateur " . $currentUser->getId() . " tentant de modifier le profil " . $id);
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que votre propre profil');
         }
@@ -99,7 +100,7 @@ class ProfilController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
 
-        $form = $this->createForm(ProfilType::class, $user);
+    $form = $this->createForm(ProfilType::class, $user, ['is_admin' => $isAdmin]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

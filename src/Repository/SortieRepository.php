@@ -99,4 +99,45 @@ class SortieRepository extends ServiceEntityRepository
                   ->getQuery()
                   ->getResult();
     }
+
+    /**
+     * Trouve les sorties avec pagination et recherche
+     */
+    public function findBySearchPaginated(string $search, int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('s');
+        $qb->join('s.etat', 'e');
+        if (!empty($search)) {
+            $qb->where('s.nom LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        
+        $qb->where('e.libelle NOT IN (:sortiePassee)')
+        ->setParameter('sortiePassee', ['Clôturée', 'Annulée']);
+        return $qb
+            ->orderBy('s.dateHeureDebut', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les sorties avec recherche
+     */
+    public function countBySearch(string $search): int
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)');
+        $qb->join('s.etat', 'e');
+        if (!empty($search)) {
+            $qb->where('s.nom LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        $qb->where('e.libelle NOT IN (:sortiePassee)')
+        ->setParameter('sortiePassee', ['Clôturée', 'Annulée']);
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

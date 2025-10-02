@@ -113,37 +113,6 @@ class SortieController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/publier', name: 'app_sortie_publish', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function publish(Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository): Response
-    {
-        /** @var Participant $user */
-        $user = $this->getUser();
-        
-        // Vérifier que l'utilisateur est l'organisateur
-        if ($sortie->getOrganisateur()->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez publier que vos propres sorties.');
-        }
-
-        // Vérifier que la sortie est en état "Créée"
-        if ($sortie->getEtat()->getLibelle() !== 'Créée') {
-            $this->addFlash('error', 'Cette sortie ne peut pas être publiée.');
-            return $this->redirectToRoute('app_sortie_show', ['id' => $sortie->getId()]);
-        }
-
-        // Changer l'état vers "Ouverte"
-        $etatOuverte = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
-        if ($etatOuverte) {
-            $sortie->setEtat($etatOuverte);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'La sortie a été publiée et est maintenant ouverte aux inscriptions !');
-        } else {
-            $this->addFlash('error', 'Erreur lors de la publication de la sortie.');
-        }
-
-        return $this->redirectToRoute('app_sortie_show', ['id' => $sortie->getId()]);
-    }
-
     #[Route('/{id}/annuler', name: 'app_sortie_cancel', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function cancel(Request $request, Sortie $sortie, EntityManagerInterface $entityManager, EtatRepository $etatRepository, MessagerieSortieService $messagerie): Response
     {
@@ -151,7 +120,8 @@ class SortieController extends AbstractController
         $user = $this->getUser();
         
         // Vérifier que l'utilisateur est l'organisateur
-        if ($sortie->getOrganisateur()->getId() !== $user->getId()) {
+          $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        if ($sortie->getOrganisateur()->getId() !== $user->getId() && !$isAdmin) {
             throw $this->createAccessDeniedException('Vous ne pouvez annuler que vos propres sorties.');
         }
 
@@ -370,7 +340,8 @@ class SortieController extends AbstractController
         $user = $this->getUser();
         
         // Vérifier les permissions - organisateur seulement
-        if ($sortie->getOrganisateur()->getId() !== $user->getId()) {
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        if ($sortie->getOrganisateur()->getId() !== $user->getId() && !$isAdmin) {
             error_log("SortieController::editModal - Accès refusé pour l'utilisateur " . $user->getId());
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette sortie.');
         }
@@ -451,7 +422,8 @@ class SortieController extends AbstractController
         $user = $this->getUser();
         
         // Vérifier les permissions
-        if ($sortie->getOrganisateur()->getId() !== $user->getId()) {
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        if ($sortie->getOrganisateur()->getId() !== $user->getId() && !$isAdmin) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à annuler cette sortie.');
         }
 
@@ -541,7 +513,8 @@ class SortieController extends AbstractController
         $user = $this->getUser();
         
         // Vérifier les permissions
-        if ($sortie->getOrganisateur()->getId() !== $user->getId()) {
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        if ($sortie->getOrganisateur()->getId() !== $user->getId() && !$isAdmin) {
             return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas autorisé à publier cette sortie.']);
         }
         

@@ -76,4 +76,37 @@ class ParticipantRepository extends ServiceEntityRepository implements PasswordU
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+    
+    /**
+     * Trouve les participants avec pagination et recherche
+     */
+    public function findBySearchPaginated(string $search, int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        if (!empty($search)) {
+            $qb->where('p.nom LIKE :search OR p.prenom LIKE :search OR p.pseudo LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        return $qb
+            ->orderBy('p.nom', 'ASC')
+            ->addOrderBy('p.prenom', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les participants avec recherche
+     */
+    public function countBySearch(string $search): int
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)');
+        if (!empty($search)) {
+            $qb->where('p.nom LIKE :search OR p.prenom LIKE :search OR p.pseudo LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

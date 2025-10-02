@@ -2,12 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Participant;
 use App\Entity\Site;
+use App\Entity\Sortie;
 use App\Entity\Ville;
 use App\Form\SiteType;
+use App\Form\SortieType;
 use App\Form\VilleType;
+use App\Form\ProfilType;
 use App\Repository\SiteRepository;
 use App\Repository\VilleRepository;
+use App\Repository\SortieRepository;
+use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,12 +28,17 @@ class AdminController extends AbstractController
 {
     #[Route('/', name: 'app_admin_dashboard')]
     public function dashboard(
-        VilleRepository $villeRepository,
-        SiteRepository $siteRepository
-    ): Response {
+        VilleRepository       $villeRepository,
+        SiteRepository        $siteRepository,
+        SortieRepository      $sortieRepository,
+        ParticipantRepository $participantRepository
+    ): Response
+    {
         $stats = [
             'total_villes' => $villeRepository->count([]),
             'total_sites' => $siteRepository->count([]),
+            'total_sorties' => $sortieRepository->count([]),
+            'total_profils' => $participantRepository->count([]),
         ];
 
         return $this->render('admin/dashboard.html.twig', [
@@ -43,10 +54,10 @@ class AdminController extends AbstractController
         $search = $request->query->get('search', '');
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
-        
+
         $villes = $villeRepository->findBySearchPaginated($search, $page, $limit);
         $total = $villeRepository->countBySearch($search);
-        
+
         $villesData = [];
         foreach ($villes as $ville) {
             $villesData[] = [
@@ -83,12 +94,13 @@ class AdminController extends AbstractController
 
     #[Route('/ville/save/{id?}', name: 'app_admin_ville_save', methods: ['POST'])]
     public function saveVille(
-        Request $request,
+        Request                $request,
         EntityManagerInterface $em,
-        ?Ville $ville = null
-    ): JsonResponse {
+        ?Ville                 $ville = null
+    ): JsonResponse
+    {
         $isEdit = $ville !== null;
-        
+
         if (!$ville) {
             $ville = new Ville();
         }
@@ -158,10 +170,10 @@ class AdminController extends AbstractController
         $search = $request->query->get('search', '');
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
-        
+
         $sites = $siteRepository->findBySearchPaginated($search, $page, $limit);
         $total = $siteRepository->countBySearch($search);
-        
+
         $sitesData = [];
         foreach ($sites as $site) {
             $sitesData[] = [
@@ -176,6 +188,7 @@ class AdminController extends AbstractController
             'total' => $total,
             'page' => $page,
             'pages' => ceil($total / $limit)
+            
         ]);
     }
 
@@ -197,12 +210,13 @@ class AdminController extends AbstractController
 
     #[Route('/site/save/{id?}', name: 'app_admin_site_save', methods: ['POST'])]
     public function saveSite(
-        Request $request,
+        Request                $request,
         EntityManagerInterface $em,
-        ?Site $site = null
-    ): JsonResponse {
+        ?Site                  $site = null
+    ): JsonResponse
+    {
         $isEdit = $site !== null;
-        
+
         if (!$site) {
             $site = new Site();
         }
@@ -262,4 +276,148 @@ class AdminController extends AbstractController
             ], 500);
         }
     }
+
+    // === GESTION DES SORTIES ===
+
+    #[Route('/sorties/data', name: 'app_admin_sorties_data', methods: ['GET'])]
+    public function getSortiesData(SortieRepository $sortieRepository, Request $request): JsonResponse
+    {
+        $search = $request->query->get('search', '');
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $sorties = $sortieRepository->findBySearchPaginated($search, $page, $limit);
+        $total = $sortieRepository->countBySearch($search);
+
+        $sortiesData = [];
+        foreach ($sorties as $sortie) {
+            $sortiesData[] = [
+                'id' => $sortie->getId(),
+                'nom' => $sortie->getNom(),
+                'dateHeureDebut' => $sortie->getDateHeureDebut()->format('d/m/Y H:i'),
+                'nbParticipants' => $sortie->getInscriptions()->count(),
+                'organisateur' => $sortie->getOrganisateur()->getPseudo(),
+                'etat' => $sortie->getEtat()->getLibelle(),
+
+            ];
+        }
+
+        return new JsonResponse([
+            'sorties' => $sortiesData,
+            'total' => $total,
+            'page' => $page,
+            'pages' => ceil($total / $limit)
+        ]);
+    }
+
+    #[Route('/sorties/form/{id?}', name: 'app_admin_sortie_form', methods: ['GET'])]
+    public function getSortieForm(?Sortie $sortie = null): Response
+    {
+        if (!$sortie) {
+            $sortie = new Sortie();
+            $form = $this->createForm(SortieType::class, $sortie);
+            return $this->render('sortie/modal_create.html.twig', [
+                'form' => $form->createView(),
+                'sortie' => $sortie,
+                'isEdit' => false,
+            ]);
+        }
+
+        $form = $this->createForm(SortieType::class, $sortie);
+
+        return $this->render('sortie/modal_edit.html.twig', [
+            'form' => $form->createView(),
+            'sortie' => $sortie,
+            'isEdit' => $sortie->getId() !== null,
+        ]);
+    }
+
+    #[Route('/sorties/delete/{id}', name: 'app_admin_sortie_delete', methods: ['DELETE'])]
+    public function deleteSortie(Sortie $sortie, EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $em->remove($sortie);
+            $em->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Sortie supprimée avec succès!'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression de la sortie.'
+            ], 500);
+        }
+    }
+
+    // === GESTION DES PROFILS ===
+
+    #[Route('/profils/data', name: 'app_admin_profils_data', methods: ['GET'])]
+    public function getProfilsData(ParticipantRepository $participantRepository, Request $request): JsonResponse
+    {
+        $search = $request->query->get('search', '');
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $participants = $participantRepository->findBySearchPaginated($search, $page, $limit);
+        $total = $participantRepository->countBySearch($search);
+
+        $participantsData = [];
+        foreach ($participants as $participant) {
+            $participantsData[] = [
+                'id' => $participant->getId(),
+                'pseudo' => $participant->getPseudo(),
+                'nom' => $participant->getNom(),
+                'prenom' => $participant->getPrenom(),
+            ];
+        }
+
+        return new JsonResponse([
+            'participants' => $participantsData,
+            'total' => $total,
+            'page' => $page,
+            'pages' => ceil($total / $limit)
+        ]);
+    }
+
+    #[Route('/profils/form/{id?}', name: 'app_admin_profil_form', methods: ['GET'])]
+    public function getProfilsForm(?Participant $participant = null): Response
+    {
+        if (!$participant) {
+            $participant = new Participant();
+            $form = $this->createForm(ProfilType::class, $participant, ['is_admin' => true]);
+            return $this->render('registration/register.html.twig', [
+                'form' => $form->createView(),
+                'participant' => $participant,
+                'user' => $participant,
+            ]);
+        }
+
+        $form = $this->createForm(ProfilType::class, $participant, ['is_admin' => true]);
+        return $this->render('profil/modal_edit.html.twig', [
+            'form' => $form->createView(),
+            'participant' => $participant,
+            'user' => $participant,
+        ]);
+    }
+    #[Route('/profils/delete/{id}', name: 'app_admin_profil_delete', methods: ['DELETE'])]
+    public function deleteProfils(Participant $participant, EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $em->remove($participant);
+            $em->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Profil supprimé avec succès!'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression du profil.'
+            ], 500);
+        }
+    }
+
 }
