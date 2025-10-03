@@ -56,12 +56,6 @@
                                 <i class="bi bi-house"></i> Accueil
                             </a>
                         </li>
-                        {% if is_granted('ROLE_USER') %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    <i class="bi bi-calendar-plus"></i> Sorties
-                                </a>
-                            </li>
 
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item">
@@ -70,7 +64,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                        {% endif %}
                     </ul>
                     <ul class="navbar-nav">
                         {% if is_granted('ROLE_USER') %}
