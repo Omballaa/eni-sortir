@@ -2,10 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Etat;
-use App\Entity\Sortie;
-use App\Repository\SortieRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\SortieCloturService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,14 +15,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class ClotureSortiesCommand extends Command
 {
-
     public function __construct(
-        private SortieRepository $sortieRepository,
-        private EntityManagerInterface $entityManager
+        private SortieCloturService $sortieCloturService
     ) {
         parent::__construct();
     }
-
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -33,43 +27,31 @@ class ClotureSortiesCommand extends Command
         $io->title('Clôture des sorties');
 
         try {
-            $now = new \DateTime();
-            $sorties = $this->entityManager->getRepository(Sortie::class)->findAll();
-            $etatCloturee = $this->entityManager->getRepository(Etat::class)->findOneBy(['libelle' => 'Clôturée']);
+            // Afficher les statistiques avant
+            $statsAvant = $this->sortieCloturService->getStatistiquesEtats();
+            $io->section('État des sorties avant clôture');
+            $io->table(['État', 'Nombre'], array_map(fn($etat, $count) => [$etat, $count], array_keys($statsAvant), $statsAvant));
             
-            if (empty($sorties)) {
-                $io->error('Aucune sortie trouvée.');
-                return Command::FAILURE;
-            }
-
-            if (!$etatCloturee) {
-                $io->error('L\'état "Clôturée" est introuvable. Veuillez vérifier les données de l\'application.');
-                return Command::FAILURE;
-            }
-
-            $io->section('Vérification des sorties à clôturer');
-            $count = 0;
-
-            foreach ($sorties as $sortie) {
-                if (
-                    $sortie->getDateHeureDebut() < $now &&
-                    $sortie->getEtat()->getLibelle() !== 'Annulée' &&
-                    $sortie->getEtat()->getLibelle() !== 'Créée' &&
-                    $sortie->getEtat()->getLibelle() !== 'Clôturée'
-                ) {
-                    $sortie->setEtat($etatCloturee);
-                    $count++;
-                }
-            }
+            // Exécuter la clôture
+            $io->section('Exécution de la clôture automatique');
+            $count = $this->sortieCloturService->cloturerSortiesExpirees();
             
-            $this->entityManager->flush();
-            $io->success("$count sorties clôturées.");
+            // Afficher les résultats
+            if ($count > 0) {
+                $io->success("$count sorties clôturées avec succès.");
+                
+                // Afficher les statistiques après
+                $statsApres = $this->sortieCloturService->getStatistiquesEtats();
+                $io->section('État des sorties après clôture');
+                $io->table(['État', 'Nombre'], array_map(fn($etat, $count) => [$etat, $count], array_keys($statsApres), $statsApres));
+            } else {
+                $io->info('Aucune sortie à clôturer.');
+            }
 
             return Command::SUCCESS;
 
-
         } catch (\Throwable $th) {
-            $io->error('Une erreur est survenue lors de la clôture des sorties.');
+            $io->error('Une erreur est survenue lors de la clôture des sorties : ' . $th->getMessage());
             return Command::FAILURE;
         }
     }
