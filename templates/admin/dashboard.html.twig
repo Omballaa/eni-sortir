@@ -909,7 +909,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('formModalContent').innerHTML = html;
                 
                 // Attacher les événements après le chargement
-                attachVilleFormEvents(id);
+                id;
                 
                 new bootstrap.Modal(document.getElementById('formModal')).show();
             })
@@ -1175,6 +1175,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Réponse ville:', data);
                 if (data.success) {
                     window.onFormSuccess(data.message, 'ville');
+                } else {
+                    // Afficher les erreurs
+                    let errorHtml = '<div class="alert alert-danger"><ul class="mb-0">';
+                    data.errors.forEach(error => {
+                        errorHtml += `<li>${error}</li>`;
+                    });
+                    errorHtml += '</ul></div>';
+                    
+                    document.getElementById('formMessages').innerHTML = errorHtml;
+                    
+                    // Réactiver le bouton
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>' + (id ? 'Modifier' : 'Créer');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.getElementById('formMessages').innerHTML = 
+                    '<div class="alert alert-danger">Une erreur est survenue lors de la sauvegarde.</div>';
+                
+                // Réactiver le bouton
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save me-1"></i>' + (id ? 'Modifier' : 'Créer');
+            });
+        });
+    }
+
+      function attachSiteFormEvents(id = null) {
+        const form = document.getElementById('siteForm');
+        const submitBtn = document.getElementById('submitSiteBtn');
+        
+        if (!form || !submitBtn) return;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Soumission formulaire site');
+            
+            // Désactiver le bouton
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Traitement...';
+            
+            const formData = new FormData(form);
+            const url = id ? `{{ path('app_admin_site_save') }}/${id}` : `{{ path('app_admin_site_save') }}`;
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Réponse site:', data);
+                if (data.success) {
+                    window.onFormSuccess(data.message, 'site');
                 } else {
                     // Afficher les erreurs
                     let errorHtml = '<div class="alert alert-danger"><ul class="mb-0">';
