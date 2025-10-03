@@ -2,9 +2,7 @@
 
 namespace App\EventListener;
 
-use App\Entity\Etat;
-use App\Entity\Sortie;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\SortieCloturService;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,7 +15,7 @@ class SortieSchedulerListener
     private static ?int $lastExecution = null;
     
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private SortieCloturService $sortieCloturService,
         private LoggerInterface $logger
     ) {}
 
@@ -48,36 +46,9 @@ class SortieSchedulerListener
     private function executeClotureSorties(): void
     {
         try {
-            $now = new \DateTime();
-            $sorties = $this->entityManager->getRepository(Sortie::class)->findAll();
-            $etatCloturee = $this->entityManager->getRepository(Etat::class)->findOneBy(['libelle' => 'Clôturée']);
-            
-            if (!$etatCloturee) {
-                $this->logger->error('L\'état "Clôturée" est introuvable dans la base de données');
-                return;
-            }
-
-            $count = 0;
-            foreach ($sorties as $sortie) {
-                if (
-                    $sortie->getDateHeureDebut() < $now &&
-                    $sortie->getEtat()->getLibelle() !== 'Annulée' &&
-                    $sortie->getEtat()->getLibelle() !== 'Clôturée'
-                ) {
-                    $sortie->setEtat($etatCloturee);
-                    $count++;
-                }
-            }
-            
-            if ($count > 0) {
-                $this->entityManager->flush();
-                $this->logger->info("Clôture automatique: {$count} sorties clôturées");
-            } else {
-                $this->logger->debug("Clôture automatique: aucune sortie à clôturer");
-            }
-            
+            $count = $this->sortieCloturService->cloturerSortiesExpirees();
         } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de l\'exécution automatique de la clôture des sorties', [
+            $this->logger->error('Erreur lors de l\'exécution automatique de la clôture des sorties via EventListener', [
                 'exception' => $e->getMessage()
             ]);
         }
